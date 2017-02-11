@@ -15,4 +15,8 @@
         completions."
     </string>
     <string name="action_string_registration"> "Register new account"</string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+    <string name="user_name_text_field">Username</string>
+    <string name="password_text_field">Password</string>
+    <string name="email_text_field">Email</string>
 </resources>

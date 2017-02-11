@@ -1,4 +1,4 @@
-package com.example.haidangdam.watershed;
+package com.example.haidangdam.watershed.controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.haidangdam.watershed.R;
 
 
 /**
