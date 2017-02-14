@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "309950964169",
+    "firebase_url": "https://watershed-228b3.firebaseio.com",
+    "project_id": "watershed-228b3",
+    "storage_bucket": "watershed-228b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309950964169:android:942c507576199cf4",
+        "android_client_info": {
+          "package_name": "com.example.haidangdam.watershed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309950964169-4361t6out8ecjcmm97v38ja8dqjd38d2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.haidangdam.watershed",
+            "certificate_hash": "B9A9CCCF1FE8CDA9DE6C7DA7F307C71019F60CF8"
+          }
+        },
+        {
+          "client_id": "309950964169-20pe2n20lqfha88lnl34q3kv76u5pspt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPXFuTjQDQpmWAgQP2wbUE30J5SrUPSgM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309950964169-20pe2n20lqfha88lnl34q3kv76u5pspt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

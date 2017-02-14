@@ -19,8 +19,8 @@ public class LoginActivity extends AppCompatActivity {
     Button LogInButton;
     EditText userNameLogin;
     EditText passwordLogin;
-    private String dummyUserName = "hello";
-    private String dummyPassword = "world";
+    Button registrationButton;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,37 +28,17 @@ public class LoginActivity extends AppCompatActivity {
         LogInButton = (Button) findViewById(R.id.email_sign_in_button);
         userNameLogin = (EditText) findViewById(R.id.email);
         passwordLogin = (EditText) findViewById(R.id.password);
-
-        LogInButton.setOnClickListener(new View.OnClickListener() {
+        registrationButton = (Button) findViewById(R.id.registration_sign_in_button);
+        registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                String typeUserName = userNameLogin.getText().toString();
-                String typePassword = passwordLogin.getText().toString();
-                validatePasswordAndUsername(typeUserName, typePassword);
+            public void onClick(View v) {
+                goToRegistrationActivity();
             }
         });
 
     }
 
-    /**
-     * check validation and move to the next action.
-     * @param typeUserName the UserName the user type to the field
-     * @param typePassword the Password the user type to the field
-     */
-    private void validatePasswordAndUsername(String typeUserName, String typePassword) {
-        if(typeUserName.isEmpty() ||typePassword.isEmpty()) {
-            processEmptyTextField();
-        } else {
-            if (typeUserName.equals(dummyUserName)
-                    && typePassword.equals(dummyPassword)) {
-                processCorrectPasswordAndUserName();
-            } else {
-                processWrongPasswordOrUserName();
-            }
-        }
-    }
-
-    /**
+  /**
      * Action when the either user input is empty
      */
     private void processEmptyTextField() {
@@ -68,6 +48,11 @@ public class LoginActivity extends AppCompatActivity {
 
         Toast toast = Toast.makeText(context, string, duration);
         toast.show();
+    }
+
+    private void goToRegistrationActivity() {
+        Intent registrationActivity = new Intent(this, RegistrationActivity.class);
+        startActivity(registrationActivity);
     }
 
     /**
