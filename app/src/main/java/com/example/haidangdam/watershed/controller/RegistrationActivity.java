@@ -1,6 +1,7 @@
 package com.example.haidangdam.watershed.controller;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,8 @@ public class RegistrationActivity extends AppCompatActivity {
     Button registrationButton;
     private FirebaseAuth mAuth;
     private ProgressDialog progressDialog;
+    public static final String password = "PASSWORD";
+    public static final String username = "USERNAME";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,10 @@ public class RegistrationActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     * @return validate the field if any is left empty
+     */
     private boolean validateField() {
         if (emailEditText.getText().toString().isEmpty() | passwordEditText.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(), "Have to fill up both field", Toast.LENGTH_LONG).show();
@@ -51,7 +58,9 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Create the account from firebase when the user hit the button
+     */
     private void createAccount() {
         progressDialog.setMessage("Please wait!");
         progressDialog.show();
@@ -59,15 +68,29 @@ public class RegistrationActivity extends AppCompatActivity {
                 passwordEditText.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressDialog.dismiss();
                         if (!task.isSuccessful()) {
                             Toast.makeText(getApplicationContext(),
                                     "Authentication failed: " + task.getException().toString(), Toast.LENGTH_LONG).show();
                         } else {
                             Log.d("Sign up sucessful", "Sign up successful");
+                            goBackToLogIn();
                         }
-                        progressDialog.dismiss();
                     }
 
         });
     }
+
+    /**
+     * Go back to the log in page when finish
+     */
+    private void goBackToLogIn() {
+        Intent goBackToLogIn = new Intent(this, LoginActivity.class);
+        Bundle dataBackToLogIn = new Bundle();
+        dataBackToLogIn.putString(username, emailEditText.getText().toString());
+        dataBackToLogIn.putString(password, passwordEditText.getText().toString());
+        goBackToLogIn.putExtras(dataBackToLogIn);
+        startActivity(goBackToLogIn);
+    }
+
 }
