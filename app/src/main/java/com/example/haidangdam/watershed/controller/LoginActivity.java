@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-  /**
+    /**
      * Action when the either user input is empty
      */
     private void processEmptyTextField() {
@@ -88,6 +88,9 @@ public class LoginActivity extends AppCompatActivity {
         toast.show();
     }
 
+    /**
+     *  Go to registration screen when hitting registration button
+     */
     private void goToRegistrationActivity() {
         Intent registrationActivity = new Intent(this, RegistrationActivity.class);
         startActivity(registrationActivity);
