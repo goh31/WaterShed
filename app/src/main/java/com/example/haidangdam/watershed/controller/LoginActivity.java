@@ -91,7 +91,8 @@ public class LoginActivity extends AppCompatActivity {
         LogInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (userNameLogin.getText().toString().isEmpty() | passwordLogin.getText().toString().isEmpty()) {
+                if (userNameLogin.getText().toString().isEmpty() |
+                        passwordLogin.getText().toString().isEmpty()) {
                     processEmptyTextField();
                 } else {
                     authenticateUser();
@@ -102,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
         logInFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d("Android", "Facebook login: "+ loginResult);
+                Log.d("Android", "Facebook login: " + loginResult);
                 handleFacebookLoginToken(loginResult.getAccessToken());
             }
 
@@ -110,15 +111,18 @@ public class LoginActivity extends AppCompatActivity {
             public void onCancel() {
                 Log.d("Facebook", "User cancel");
             }
+
             @Override
             public void onError(FacebookException exception) {
-                Toast.makeText(getApplicationContext(), "Log in failed: " + exception.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Log in failed: " + exception.toString(),
+                        Toast.LENGTH_LONG).show();
             }
         });
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail().build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this).
+                addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         googleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,7 +145,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     /**
-     *  Go to registration screen when hitting registration button
+     * Go to registration screen when hitting registration button
      */
     private void goToRegistrationActivity() {
         Intent registrationActivity = new Intent(this, RegistrationActivity.class);
@@ -151,6 +155,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Put all the data passed from the registration to the appropriate field
+     *
      * @param data The data that pass from the registration
      */
     private void putDataIntoField(Bundle data) {
@@ -168,15 +173,16 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.show();
         mAuth.signInWithEmailAndPassword(userNameLogin.getText().toString(),
                 passwordLogin.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> result) {
-                        progressDialog.dismiss();
-                        if (!result.isSuccessful()) {
-                           Toast.makeText(getApplicationContext(), result.getException().toString(), Toast.LENGTH_LONG).show();
-                       } else {
-                            processCorrectPasswordAndUsername();
-                       }
-                    }
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> result) {
+                progressDialog.dismiss();
+                if (!result.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), result.getException().toString(),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    processCorrectPasswordAndUsername();
+                }
+            }
         });
     }
 
@@ -192,6 +198,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Sign in with facebook using Firebase
+     *
      * @param token The token confirmation from Facebook
      */
     private void handleFacebookLoginToken(AccessToken token) {
@@ -238,7 +245,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     *
      * @param acct
      */
     private void signInWithGoogleThroughFirebase(GoogleSignInAccount acct) {
