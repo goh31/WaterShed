@@ -13,12 +13,20 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.haidangdam.watershed.R;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
 
 /**
  * A login screen that offers login via email/password.
@@ -31,17 +39,23 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ProgressDialog progressDialog;
+    private LoginButton logInFacebook;
+    private CallbackManager callbackManager;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
         LogInButton = (Button) findViewById(R.id.email_sign_in_button);
         userNameLogin = (EditText) findViewById(R.id.email);
         passwordLogin = (EditText) findViewById(R.id.password);
         registrationButton = (Button) findViewById(R.id.registration_sign_in_button);
+        logInFacebook = (LoginButton) findViewById(R.id.login_button);
+        logInFacebook.setReadPermissions("email", "public_profile");
         progressDialog = new ProgressDialog(this);
+        callbackManager = CallbackManager.Factory.create();
         if (getIntent().getExtras() != null) {
             putDataIntoField(getIntent().getExtras());
         }
@@ -72,6 +86,23 @@ public class LoginActivity extends AppCompatActivity {
                     authenticateUser();
                 }
             }
+
+        });
+        logInFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d("Android", "Facebook login: "+ loginResult);
+                handleFacebookLoginToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d("Facebook", "User cancel");
+            }
+            @Override
+            public void onError(FacebookException exception) {
+                Toast.makeText(getApplicationContext(), "Log in failed: " + exception.toString(), Toast.LENGTH_LONG).show();
+            }
         });
 
     }
@@ -88,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         toast.show();
     }
 
+
     /**
      *  Go to registration screen when hitting registration button
      */
@@ -95,6 +127,7 @@ public class LoginActivity extends AppCompatActivity {
         Intent registrationActivity = new Intent(this, RegistrationActivity.class);
         startActivity(registrationActivity);
     }
+
 
     /**
      * Put all the data passed from the registration to the appropriate field
@@ -105,6 +138,7 @@ public class LoginActivity extends AppCompatActivity {
         userNameLogin.setText(data.getString(RegistrationActivity.username));
         passwordLogin.setText(data.getString(RegistrationActivity.password));
     }
+
 
     /**
      * Authenticate the password and email from Firebase Database
@@ -126,12 +160,44 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+
     /**
      * If it is the right password, move to the main activity
      */
     private void processCorrectPasswordAndUsername() {
         Intent intent = new Intent(this, NextActivity.class);
         startActivity(intent);
+    }
+
+
+    /**
+     * Sign in with facebook using Firebase
+     * @param token The token confirmation from Facebook
+     */
+    private void handleFacebookLoginToken(AccessToken token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this,
+                new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            processCorrectPasswordAndUsername();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Login failed: " + task.getException(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * After running authorization with Facebook, coming back to the main screen, this method will be invoked
+     * Call Back Manager will get the data from log in activity an run the registration.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
 
