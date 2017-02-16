@@ -20,6 +20,12 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -27,6 +33,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 /**
  * A login screen that offers login via email/password.
@@ -41,12 +48,15 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private LoginButton logInFacebook;
     private CallbackManager callbackManager;
-
+    SignInButton googleSignIn;
+    private GoogleApiClient mGoogleApiClient;
+    private static final int FACEBOOK_REQUEST_CODE = 1709;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        FacebookSdk.sdkInitialize(getApplicationContext(), FACEBOOK_REQUEST_CODE);
         setContentView(R.layout.activity_login);
         LogInButton = (Button) findViewById(R.id.email_sign_in_button);
         userNameLogin = (EditText) findViewById(R.id.email);
@@ -55,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         logInFacebook = (LoginButton) findViewById(R.id.login_button);
         logInFacebook.setReadPermissions("email", "public_profile");
         progressDialog = new ProgressDialog(this);
+        googleSignIn = (SignInButton) findViewById(R.id.sign_in_button);
         callbackManager = CallbackManager.Factory.create();
         if (getIntent().getExtras() != null) {
             putDataIntoField(getIntent().getExtras());
@@ -104,7 +115,16 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Log in failed: " + exception.toString(), Toast.LENGTH_LONG).show();
             }
         });
-
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail().build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
+        googleSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signInWithGoogleActivity();
+            }
+        });
     }
 
     /**
@@ -191,13 +211,74 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * After running authorization with Facebook, coming back to the main screen, this method will be invoked
+     * After running authorization with Facebook or , coming back to the main screen, this method will be invoked
      * Call Back Manager will get the data from log in activity an run the registration.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if (FacebookSdk.isFacebookRequestCode(requestCode)) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult googleSignIn = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (googleSignIn.isSuccess()) {
+                GoogleSignInAccount googleAccount = googleSignIn.getSignInAccount();
+                signInWithGoogleThroughFirebase(googleAccount);
+            }
+        }
     }
+
+    /**
+     *
+     */
+    private void signInWithGoogleActivity() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    /**
+     *
+     * @param acct
+     */
+    private void signInWithGoogleThroughFirebase(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this,
+                new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), "Authentication failed: "
+                                    + task.getException(), Toast.LENGTH_LONG).show();
+                        } else {
+                            processCorrectPasswordAndUsername();
+                        }
+                    }
+                });
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+        mGoogleApiClient.connect();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+        mGoogleApiClient.disconnect();
+    }
+
+
 }
 
