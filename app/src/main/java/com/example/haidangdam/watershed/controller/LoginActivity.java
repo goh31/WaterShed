@@ -34,6 +34,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * A login screen that offers login via email/password.
@@ -52,6 +54,9 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
     private static final int FACEBOOK_REQUEST_CODE = 1709;
     private static final int RC_SIGN_IN = 9001;
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference refUser;
+    private String pathUser = "userID";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -129,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                 signInWithGoogleActivity();
             }
         });
+        refUser = database.getReference(pathUser);
     }
 
     /**
@@ -237,7 +243,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This activity will start the background call to Google server to authenticate user
      */
     private void signInWithGoogleActivity() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -245,7 +251,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * @param acct
+     * After having the google account successfully authenticated by google, we will get it
+     * sign it with our app through Firebase
+     * @param acct the google account we get from the user and authenticated by google
      */
     private void signInWithGoogleThroughFirebase(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);

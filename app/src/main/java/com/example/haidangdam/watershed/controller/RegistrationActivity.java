@@ -16,6 +16,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import model.User;
 
 public class RegistrationActivity extends AppCompatActivity {
     EditText emailEditText;
@@ -25,6 +29,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     public static final String password = "PASSWORD";
     public static final String username = "USERNAME";
+    DatabaseReference databaseUser;
+    private String pathUser = "userID";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +39,7 @@ public class RegistrationActivity extends AppCompatActivity {
         passwordEditText = (EditText) findViewById(R.id.password_edit_text_registration);
         mAuth = FirebaseAuth.getInstance();
         registrationButton = (Button) findViewById(R.id.registration_button);
+        databaseUser = FirebaseDatabase.getInstance().getReference().child(pathUser);
         progressDialog = new ProgressDialog(this);
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +82,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         } else {
                             Log.d("Sign up sucessful", "Sign up successful");
                             goBackToLogIn();
+                            addToDatabase();
                         }
                     }
 
@@ -92,5 +100,11 @@ public class RegistrationActivity extends AppCompatActivity {
         goBackToLogIn.putExtras(dataBackToLogIn);
         startActivity(goBackToLogIn);
     }
+
+    private void addToDatabase() {
+        User newUser = new User(emailEditText.getText().toString(), "user");
+        databaseUser.push().setValue(newUser);
+    }
+
 
 }
