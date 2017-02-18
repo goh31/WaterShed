@@ -86,7 +86,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user != null) {
+
                     Log.d("MAIN ACTIVITY", "USER SIGN IN");
                 } else {
                     Log.d("MAIN ACTIVITY", "USER SIGN OUT");
