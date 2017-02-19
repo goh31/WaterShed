@@ -71,6 +71,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private void createAccount() {
         progressDialog.setMessage("Please wait!");
         progressDialog.show();
+        Log.d("1", "something");
         mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(),
                 passwordEditText.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
