@@ -115,6 +115,7 @@ public class RegistrationActivity extends AppCompatActivity {
         dataBackToLogIn.putString(password, passwordEditText.getText().toString());
         goBackToLogIn.putExtras(dataBackToLogIn);
         startActivity(goBackToLogIn);
+        finish();
     }
 
     /**
