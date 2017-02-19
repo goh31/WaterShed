@@ -9,7 +9,13 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+<<<<<<< HEAD
     tools:context="com.example.haidangdam.watershed.controller.LoginActivity">
+=======
+    android:background="@drawable/bluebg"
+    tools:context="com.example.haidangdam.watershed.controller.LoginActivity"
+>
+>>>>>>> e883f628e1cc162936c369a342dfae23d7b066d9
 
     <!-- Login progress -->
     <ScrollView
@@ -77,6 +83,7 @@
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
+                android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>

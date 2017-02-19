@@ -1,11 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:text="Hello, User!"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/helloUser" />
+
+    <TextView
+        android:text="NAME"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/namePrompt" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/nameTextField"
+        android:hint="Your Name" />
+
+    <TextView
+        android:text="HOME ADDRESS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/homeAddressPrompt" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/homeAddressField"
+        android:hint="Ferst Drive 350" />
+
+    <TextView
+        android:text="PHONE NUMBER"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/phoneNumberPrompt" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/phoneNumberField"
+        android:hint="(404) 000-0000" />
+
+    <TextView
+        android:text="EMAIL ADDRESS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/emailAddressPrompt" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/emailAddressField"
+        android:hint="foobar@me.com" />
+
+    <TextView
+        android:text="PASSWORD"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/passwordPrompt" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passwordField"
+        android:hint="123456" />
 
     <Button
-        android:text="Log Off Button"
+        android:text="Update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/updateButton" />
+
+    <Button
+        android:text="Log Off"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/log_off_button" />
+
 </LinearLayout>
