@@ -7,8 +7,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.haidangdam.watershed.R;
@@ -16,8 +18,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import model.User;
 
@@ -30,7 +36,8 @@ public class RegistrationActivity extends AppCompatActivity {
     public static final String password = "PASSWORD";
     public static final String username = "USERNAME";
     DatabaseReference databaseUser;
-    private String pathUser = "userID";
+    private String pathUser= "userID";
+    Spinner spinnerRegistration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +47,15 @@ public class RegistrationActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         registrationButton = (Button) findViewById(R.id.registration_button);
         databaseUser = FirebaseDatabase.getInstance().getReference().child(pathUser);
+        spinnerRegistration = (Spinner) findViewById(R.id.spinnerRegistration);
+        List<String> userType = new ArrayList<String>();
+        userType.add("User");
+        userType.add("Worker");
+        userType.add("Manager");
+        userType.add("Admin");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, userType);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRegistration.setAdapter(dataAdapter);
         progressDialog = new ProgressDialog(this);
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +65,6 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     /**
@@ -57,8 +72,9 @@ public class RegistrationActivity extends AppCompatActivity {
      * @return validate the field if any is left empty
      */
     private boolean validateField() {
-        if (emailEditText.getText().toString().isEmpty() | passwordEditText.getText().toString().isEmpty()) {
-            Toast.makeText(getBaseContext(), "Have to fill up both field", Toast.LENGTH_LONG).show();
+        if (emailEditText.getText().toString().isEmpty() | passwordEditText.getText().toString().isEmpty() |
+                spinnerRegistration.getSelectedItem().toString() == null) {
+            Toast.makeText(getBaseContext(), "Have to fill up 3 field", Toast.LENGTH_LONG).show();
             return false;
         } else {
             return true;
@@ -82,8 +98,8 @@ public class RegistrationActivity extends AppCompatActivity {
                                     "Authentication failed: " + task.getException().toString(), Toast.LENGTH_LONG).show();
                         } else {
                             Log.d("Sign up sucessful", "Sign up successful");
-                            goBackToLogIn();
-                            addToDatabase();
+                            FirebaseUser user = task.getResult().getUser();
+                            addToDatabase(user.getUid());
                         }
                     }
 
@@ -102,10 +118,14 @@ public class RegistrationActivity extends AppCompatActivity {
         startActivity(goBackToLogIn);
     }
 
-    private void addToDatabase() {
-        User newUser = new User(emailEditText.getText().toString(), "user");
-        databaseUser.push().setValue(newUser);
+    /**
+     *
+     */
+    private void addToDatabase(String userID) {
+        User newUser = new User(emailEditText.getText().toString(),
+                spinnerRegistration.getSelectedItem().toString());
+        Log.d("Finish", "Finish");
+        databaseUser.child(userID).setValue(newUser);
+        goBackToLogIn();
     }
-
-
 }
