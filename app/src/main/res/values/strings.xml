@@ -20,5 +20,6 @@
     <string name="password_text_field">Password</string>
     <string name="email_text_field">Email</string>
     <string name="facebook_app_id">1250463921708585</string>
+    <string name="google_maps_key">AIzaSyAVRF4t17_ZbED1qQx8rwx4btCGolV-eIU</string>
 
 </resources>

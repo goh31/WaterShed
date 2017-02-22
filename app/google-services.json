@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "309950964169-4361t6out8ecjcmm97v38ja8dqjd38d2.apps.googleusercontent.com",
+          "client_id": "309950964169-q35931mqbfhtglmi0ke9pv31b3qlll1k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.haidangdam.watershed",
-            "certificate_hash": "B9A9CCCF1FE8CDA9DE6C7DA7F307C71019F60CF8"
+            "certificate_hash": "a329ff9bd48a8ba33c5115fc260acef537d4acd5"
           }
         },
         {
@@ -42,6 +42,13 @@
             {
               "client_id": "309950964169-20pe2n20lqfha88lnl34q3kv76u5pspt.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "309950964169-3cka6hlqbf13rh4lk8fsn1jugluo3a73.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bright.WaterShed"
+              }
             }
           ]
         },

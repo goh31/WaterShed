@@ -3,32 +3,15 @@ package com.example.haidangdam.watershed.controller;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.util.Log;
-
-import android.support.annotation.Nullable;
 import android.widget.EditText;
 
 import com.example.haidangdam.watershed.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 
 /**
@@ -38,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class NextActivity extends Activity {
     Button logOffButton;
     Button updateButton;
+    Button nextToActivity;
     EditText nameTextField;
     EditText homeAddressField;
     EditText phoneNumberField;
@@ -89,16 +73,28 @@ public class NextActivity extends Activity {
                 // ...
             }
         };
+        nextToActivity = (Button) findViewById(R.id.button_info_to_main_activity);
+        nextToActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToMainActivity();
+            }
+        });
+
 
     }
 
     /**
      * Create an intent pointing to the Login Activity and startActivity used to go back
      */
-    public void goBackToLogin() {
+    private void goBackToLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
+    private void goToMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
 }

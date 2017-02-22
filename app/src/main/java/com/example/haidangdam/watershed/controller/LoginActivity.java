@@ -274,7 +274,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Call this when the user come BACK to the activity
      */
     @Override
     public void onStart() {
@@ -284,7 +284,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Call this when the activity is no longer visible
      */
     @Override
     public void onStop() {
@@ -295,6 +295,22 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleApiClient.disconnect();
     }
 
+    /**
+     * Call this when the user resume to the activity
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
 
+    /**
+     *
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mGoogleApiClient.disconnect();
+    }
 }
 

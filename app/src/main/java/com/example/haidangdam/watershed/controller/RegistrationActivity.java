@@ -120,7 +120,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Add to the Firebase database the user with appropriate usertype
      */
     private void addToDatabase(String userID) {
         User newUser = new User(emailEditText.getText().toString(),

@@ -7,6 +7,9 @@ package model;
 public class User {
     String email;
     String credential;
+    String name;
+    String homeAddress;
+    String phoneNumber;
 
     public User(String email, String credential) {
         this.email = email;
@@ -19,5 +22,32 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setHomeAddress(String homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getHomeAddress() {
+        return homeAddress;
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public boolean alreadySetExtraField() {
+        return !(phoneNumber.isEmpty());
     }
 }
