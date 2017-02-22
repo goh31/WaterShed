@@ -305,7 +305,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Call this when the user leave the activity
      */
     @Override
     public void onPause() {

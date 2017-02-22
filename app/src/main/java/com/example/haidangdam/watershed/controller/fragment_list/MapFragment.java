@@ -27,6 +27,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by haidangdam on /19/17.
+ * A Map fragment for the main activity
  */
 
 public class MapFragment extends Fragment implements LocationListener, GoogleApiClient.ConnectionCallbacks,
