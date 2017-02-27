@@ -41,21 +41,21 @@ import com.google.firebase.database.FirebaseDatabase;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
+    private static final int FACEBOOK_REQUEST_CODE = 1709;
+    private static final int RC_SIGN_IN = 9001;
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
     Button LogInButton;
     EditText userNameLogin;
     EditText passwordLogin;
     Button registrationButton;
+    SignInButton googleSignIn;
+    DatabaseReference refUser;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ProgressDialog progressDialog;
     private LoginButton logInFacebook;
     private CallbackManager callbackManager;
-    SignInButton googleSignIn;
     private GoogleApiClient mGoogleApiClient;
-    private static final int FACEBOOK_REQUEST_CODE = 1709;
-    private static final int RC_SIGN_IN = 9001;
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference refUser;
     private String pathUser = "userID";
 
     @Override
@@ -255,6 +255,7 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * After having the google account successfully authenticated by google, we will get it
      * sign it with our app through Firebase
+     *
      * @param acct the google account we get from the user and authenticated by google
      */
     private void signInWithGoogleThroughFirebase(GoogleSignInAccount acct) {
