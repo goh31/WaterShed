@@ -1,8 +1,7 @@
 package model;
 
 
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.core.GeoHash;
+import java.util.ArrayList;
 
 /**
  * Created by haidangam on 2/22/17.
@@ -10,33 +9,47 @@ import com.firebase.geofire.core.GeoHash;
 
 public class WaterData {
     String name;
-    int drinkingLevel;
-    GeoLocation geoLocation;
-    GeoHash geoHash;
+    double drinkingLevel;
+    ArrayList<Double> l;
+    String g;
 
     public WaterData() {
     }
-    public WaterData(String name, GeoLocation geoLocation,  int drinkingLevel, GeoHash geoHash) {
+    public WaterData(String name, ArrayList<Double> l,  double drinkingLevel, String g) {
         this.name = name;
-        this.geoLocation = geoLocation;
+        this.g = g;
         this.drinkingLevel = drinkingLevel;
-        this.geoHash = geoHash;
+        this.l = l;
     }
 
-    public String getName() {
+    public String getlocationName() {
         return this.name;
     }
 
-    public int DrinkingLevel() {
+    public void setlocationName(String name) {
+        this.name = name;
+    }
+    public double getcriticalLevel() {
         return this.drinkingLevel;
     }
 
-    public GeoLocation getGeoLocation() {
-        return geoLocation;
+    public void setcriticalLevel(double a) {
+        this.drinkingLevel = a;
+    }
+    public ArrayList<Double> getL() {
+        return l;
     }
 
-    public GeoHash getGeoHashString() {
-        return geoHash;
+    public void setL(ArrayList<Double> l) {
+        this.l = l;
     }
 
+    public String getg() {
+        return g;
+    }
+
+
+    public void setg(String g) {
+        this.g = g;
+    }
 }

@@ -5,15 +5,14 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.haidangdam.watershed.R;
@@ -31,24 +30,26 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import model.WaterData;
 
 import static android.R.id.list;
 
-public class ListViewFragmentAdmin extends ListFragment {
-    ListView listView;
+
+public class ListViewFragmentAdmin extends Fragment {
+    RecyclerView recyclerView;
     public static Location currentLocation;
     GeoQuery geoQuery;
     GeoFire geoFire;
-    private static Set<String> waterResourceNearby;
-    private static ArrayList<WaterData> waterDataList;
+    private Set<String> waterResourceNearby;
+    private ArrayList<WaterData> waterDataList;
     ListLocationAdapter locationAdapter;
     private DatabaseReference waterDatabaseRef;
+    int alreadyStart = 0;
+    boolean allowToStart = false;
 
     public static ListViewFragmentAdmin newInstance() {
         ListViewFragmentAdmin a = new ListViewFragmentAdmin();
@@ -57,36 +58,19 @@ public class ListViewFragmentAdmin extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("WaterShed", "Start at onCreateView");
+        allowToStart = true;
         currentLocation = new Location("dummy service");
-        View rootView = inflater.inflate(R.layout.list_view_admin_location_layout, container, false);
-        listView = (ListView) rootView.findViewById(list);
+        View rootView = inflater.inflate(R.layout.recycler_list_view_admin_location_layout, container, false);
+        recyclerView = (RecyclerView) rootView.findViewById(list);
         waterDatabaseRef = FirebaseDatabase.getInstance().getReference().child("waterResources");
         waterDataList = new ArrayList<>();
         EventBus.getDefault().register(this);
-        if (waterDataList.size() > 1) {
-            Collections.sort(waterDataList, new Comparator<WaterData>() {
-                @Override
-                public int compare(WaterData a, WaterData b) {
-                    return (int) (distanceFromCurrent(a.getGeoLocation()) - distanceFromCurrent(b.getGeoLocation()));
-                }
-            });
-        }
-        Log.d("WaterShed", "set up list view");
-        locationAdapter = new ListLocationAdapter(this.getContext(), waterDataList);
-        listView.setAdapter(locationAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView parent, View v, int position, long id) {
-                if (waterDataList.get(position) == null) {
-                    Log.d("Water Data List", "Water Data List position is null");
-                }
-                EventBus.getDefault().post(waterDataList.get(position).getGeoLocation());
-                Fragment mapFragment = MapFragmentWatershed.newInstance();
-                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                transaction.addToBackStack(null);
-                transaction.replace(R.id.main_activity_worker_view_pager, mapFragment);
-            }
-        });
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(layoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        locationAdapter = new ListLocationAdapter(getActivity(), waterDataList);
+        recyclerView.setAdapter(locationAdapter);
         return rootView;
     }
 
@@ -97,7 +81,7 @@ public class ListViewFragmentAdmin extends ListFragment {
     private double distanceFromCurrent(GeoLocation location) {
         double radius = 6378137;
         if (location != null) {
-            Log.d("Watershed", "Location is null");
+            Log.d("Watershed", "Location is not null");
         }
         double deltaLat = currentLocation.getLatitude() - location.latitude;
         double deltaLon = currentLocation.getLongitude() - location.longitude;
@@ -114,27 +98,41 @@ public class ListViewFragmentAdmin extends ListFragment {
      */
     private void getDatabaseWithLocation() {
         Log.d("WaterShed", "getDatabaseWithLocation intialize");
-        getActivity().runOnUiThread(new Runnable() {
-            public void run() {
+        Log.d("Haidang", "Dam");
+        waterDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Log.d("Watershed app", "Add Location");
                 for (String key : waterResourceNearby) {
-                    Log.d("Haidang", "Dam");
-                    waterDatabaseRef.child(key).addValueEventListener(new ValueEventListener() {
+                    waterDatabaseRef.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            WaterData data = snapshot.getValue(WaterData.class);
+                        public void onDataChange(DataSnapshot snapshotChild) {
+                            WaterData data = snapshotChild.getValue(WaterData.class);
                             waterDataList.add(data);
+                            getActivity().runOnUiThread(new Runnable() {
+                                public void run() {
+                                    locationAdapter.notifyDataSetChanged();
+                                }
+                            });
                         }
 
                         @Override
                         public void onCancelled(DatabaseError error) {
                             Log.d("WaterShed app", "Value Event Listener Error: " + error.getMessage());
                         }
-
                     });
                 }
-                locationAdapter.notifyDataSetChanged();
+                Log.d("WaterShed app", "Finish retrieving data from database");
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.d("WaterShed app", "Value Event Listener Error: " + error.getMessage());
             }
         });
+        Log.d("WaterShed app", "Test water data list size " + waterDataList.size());
     }
 
     /**
@@ -142,8 +140,14 @@ public class ListViewFragmentAdmin extends ListFragment {
      */
     @Subscribe
     public void getLocationDataFromMap(Location location) {
-        currentLocation.set(location);
-        setupGeoFire();
+        if (allowToStart) {
+            if (alreadyStart == 0) {
+                Log.d("Watershed app", "get Location From Map");
+                currentLocation.set(location);
+                setupGeoFire();
+                alreadyStart++;
+            }
+        }
     }
 
     private void setupGeoFire() {
@@ -179,34 +183,87 @@ public class ListViewFragmentAdmin extends ListFragment {
             public void onGeoQueryReady() {
                 getDatabaseWithLocation();
                 Log.d("WaterShed app", "All key data has been loaded and events have bee fired");
+                geoQuery.removeAllListeners();
             }
         });
     }
 
+    public static class ListLocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private List<WaterData> waterDataList;
+        private Context mContext;
+        int position;
 
-    public static class ListLocationAdapter extends ArrayAdapter<WaterData> {
-        private Context ctx;
-        ArrayList<WaterData> water;
-        public ListLocationAdapter(Context ctx, ArrayList<WaterData> waterData) {
-            super(ctx, 0, waterData);
-            water = waterData;
+        public ListLocationAdapter(Context context, List<WaterData> waterDataList) {
+            this.waterDataList = waterDataList;
+            this.mContext = context;
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Log.d("Watershed", "create list view element");
-            WaterData waterData = water.get(position);
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_list_view,
-                        parent, false);
+        public ListLocationViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_list_view, null);
+            position = i;
+            ListLocationViewHolder viewHolder = new ListLocationViewHolder(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("WaterShed app", "Press the button");
+                    EventBus.getDefault().post(new GeoLocation(waterDataList.get(position).getL().get(0),
+                            waterDataList.get(position).getL().get(1)));
+                    Fragment mapFragment = MapFragmentWatershed.newInstance();
+                    FragmentTransaction transaction = ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
+                    transaction.addToBackStack(null);
+                    transaction.replace(R.id.main_activity_worker_view_pager, mapFragment);
+                    transaction.commit();
+                }
+            });
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder customViewHolder, int i) {
+            WaterData data = waterDataList.get(i);
+            ((ListLocationViewHolder) customViewHolder).criticalLevel.
+                    setText("The Level of water is " + data.getcriticalLevel());
+            ((ListLocationViewHolder) customViewHolder).LocationName.setText(data.getlocationName());
+        }
+
+        @Override
+        public int getItemCount() {
+            if (waterDataList != null) {
+                Log.d("Watershed app", "Recycler List has data");
+                return waterDataList.size();
+            } else {
+                Log.d("WaterShed app", "Recycler list has no data");
+                return 0;
             }
-            TextView nameTextView = (TextView) convertView.findViewById(R.id.name_view_item_text);
-            TextView waterLevelTextView = (TextView) convertView.findViewById(R.id.water_level_item_text);
-            nameTextView.setText(waterData.getName());
-            waterLevelTextView.setText("Water Drinking Level: " + waterData.DrinkingLevel());
-            return convertView;
+        }
+
+
+
+        class ListLocationViewHolder extends RecyclerView.ViewHolder{
+            protected TextView LocationName;
+            protected TextView criticalLevel;
+            public ListLocationViewHolder(View itemView) {
+                super(itemView);
+                this.LocationName = (TextView) itemView.findViewById(R.id.name_view_item_text);
+                this.criticalLevel = (TextView) itemView.findViewById(R.id.water_level_item_text);
+            }
+
+            public TextView getLocationTextView() {
+                return LocationName;
+            }
+
+            public TextView getCriticalLevelTextView() {
+                return criticalLevel;
+            }
+
         }
     }
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        waterResourceNearby.clear();
+        waterDataList.clear();
+    }
 }

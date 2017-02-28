@@ -64,10 +64,7 @@ public class MainActivity extends FragmentActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    if (mapFragmentMyAdapter == null) {
-                        mapFragmentMyAdapter = MapFragmentWatershed.newInstance();
-                    }
-                    return mapFragmentMyAdapter;
+                    return MapFragmentWatershed.newInstance();
                 case 1:
                     return ListViewFragmentAdmin.newInstance();
                 case 2:
