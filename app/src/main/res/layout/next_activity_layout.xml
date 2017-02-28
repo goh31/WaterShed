@@ -52,34 +52,6 @@
         android:id="@+id/phoneNumberField"
         android:hint="(404) 000-0000" />
 
-    <TextView
-        android:text="EMAIL ADDRESS"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/emailAddressPrompt" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/emailAddressField"
-        android:hint="foobar@me.com" />
-
-    <TextView
-        android:text="PASSWORD"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/passwordPrompt" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/passwordField"
-        android:hint="123456" />
-
     <Button
         android:text="Update"
         android:layout_width="match_parent"

@@ -23,7 +23,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import model.User;
 
@@ -36,8 +35,11 @@ public class RegistrationActivity extends AppCompatActivity {
     public static final String password = "PASSWORD";
     public static final String username = "USERNAME";
     DatabaseReference databaseUser;
-    private String pathUser= "userID";
+    public static final String PATH_USER= "userID";
     Spinner spinnerRegistration;
+    EditText phoneNumberRegistration;
+    EditText nameRegistration;
+    EditText addressRegistration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,9 +48,12 @@ public class RegistrationActivity extends AppCompatActivity {
         passwordEditText = (EditText) findViewById(R.id.password_edit_text_registration);
         mAuth = FirebaseAuth.getInstance();
         registrationButton = (Button) findViewById(R.id.registration_button);
-        databaseUser = FirebaseDatabase.getInstance().getReference().child(pathUser);
+        databaseUser = FirebaseDatabase.getInstance().getReference().child(PATH_USER);
         spinnerRegistration = (Spinner) findViewById(R.id.spinnerRegistration);
-        List<String> userType = new ArrayList<String>();
+        phoneNumberRegistration = (EditText) findViewById(R.id.phone_number_edit_text_registration);
+        addressRegistration = (EditText) findViewById(R.id.home_address_edit_text_registration);
+        nameRegistration = (EditText) findViewById(R.id.name_edit_text_registration);
+        ArrayList<String> userType = new ArrayList<String>();
         userType.add("User");
         userType.add("Worker");
         userType.add("Manager");
@@ -125,6 +130,9 @@ public class RegistrationActivity extends AppCompatActivity {
     private void addToDatabase(String userID) {
         User newUser = new User(emailEditText.getText().toString(),
                 spinnerRegistration.getSelectedItem().toString());
+        newUser.setHomeAddress(addressRegistration.getText().toString());
+        newUser.setPhoneNumber(phoneNumberRegistration.getText().toString());
+        newUser.setName(nameRegistration.getText().toString());
         Log.d("Finish", "Finish");
         databaseUser.child(userID).setValue(newUser);
         goBackToLogIn();

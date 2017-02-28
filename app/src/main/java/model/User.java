@@ -11,6 +11,9 @@ public class User {
     String homeAddress;
     String phoneNumber;
 
+    public User() {
+
+    }
     public User(String email, String credential) {
         this.email = email;
         this.credential = credential;
@@ -32,6 +35,10 @@ public class User {
         this.name = name;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
     public void setHomeAddress(String homeAddress) {
         this.homeAddress = homeAddress;
     }
@@ -47,7 +54,4 @@ public class User {
         return phoneNumber;
     }
 
-    public boolean alreadySetExtraField() {
-        return !(phoneNumber.isEmpty());
-    }
 }

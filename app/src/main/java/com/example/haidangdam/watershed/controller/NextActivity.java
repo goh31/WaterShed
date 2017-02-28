@@ -1,6 +1,7 @@
 package com.example.haidangdam.watershed.controller;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,8 +11,14 @@ import android.widget.EditText;
 
 import com.example.haidangdam.watershed.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import model.User;
 
 
 /**
@@ -25,9 +32,13 @@ public class NextActivity extends Activity {
     EditText nameTextField;
     EditText homeAddressField;
     EditText phoneNumberField;
-    EditText emailAddressField;
-    EditText passwordField;
+    FirebaseUser firebaseUser;
+    User user;
+    String uId;
+    String credential;
     public static final String TAG = "MainView";
+    private DatabaseReference WaterDatabaseReference;
+    ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,8 +47,6 @@ public class NextActivity extends Activity {
         nameTextField = (EditText) findViewById(R.id.nameTextField);
         homeAddressField = (EditText) findViewById(R.id.homeAddressField);
         phoneNumberField = (EditText) findViewById(R.id.phoneNumberField);
-        emailAddressField = (EditText) findViewById(R.id.emailAddressField);
-        passwordField = (EditText) findViewById(R.id.passwordField);
         logOffButton = (Button) findViewById(R.id.log_off_button);
         logOffButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -45,34 +54,20 @@ public class NextActivity extends Activity {
                 goBackToLogin();
             }
         });
-
+        WaterDatabaseReference = FirebaseDatabase.getInstance().getReference().
+                child(RegistrationActivity.PATH_USER);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        uId = firebaseUser.getUid();
+        populateFieldView(uId);
         updateButton = (Button) findViewById(R.id.updateButton);
+        progressDialog = new ProgressDialog(this);
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = nameTextField.getText().toString();
-                String homeAddress = homeAddressField.getText().toString();
-                String phoneNumber = phoneNumberField.getText().toString();
-                String emailAddress = emailAddressField.getText().toString();
-                String password = passwordField.getText().toString();
+                progressDialog.show();
+                updateDatabase();
             }
         });
-
-
-        AuthStateListener mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
         nextToActivity = (Button) findViewById(R.id.button_info_to_main_activity);
         nextToActivity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,4 +92,30 @@ public class NextActivity extends Activity {
         startActivity(intent);
     }
 
+    private void populateFieldView(String uId) {
+       WaterDatabaseReference.child(uId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                user = (User) snapshot.getValue(User.class);
+                nameTextField.setText(user.getName());
+                homeAddressField.setText(user.getHomeAddress());
+                phoneNumberField.setText(user.getPhoneNumber());
+                credential = user.getCredential();
+            }
+
+           @Override
+           public void onCancelled(DatabaseError errr) {
+               Log.d("Watershed", "error: "+ errr.getMessage());
+           }
+       });
+    }
+
+    private void updateDatabase() {
+        user.setName(nameTextField.getText().toString());
+        user.setPhoneNumber(phoneNumberField.getText().toString());
+        user.setHomeAddress(homeAddressField.getText().toString());
+        WaterDatabaseReference.child(uId).setValue(user);
+        progressDialog.dismiss();
+    }
 }
+

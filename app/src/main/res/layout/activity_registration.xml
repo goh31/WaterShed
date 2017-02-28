@@ -12,17 +12,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.haidangdam.watershed.controller.RegistrationActivity">
 
-    <Button
-        android:text="Sign Up"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/registration_button"
-        android:layout_below="@+id/spinnerRegistration"
-        android:layout_alignLeft="@+id/password_edit_text_registration"
-        android:layout_alignStart="@+id/password_edit_text_registration"
-        android:layout_marginTop="55dp"
-        tools:text="Sign Up" />
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,6 +41,18 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+
+    <Button
+        android:text="Sign Up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/registration_button"
+        tools:text="Sign Up"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="36dp" />
+
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,7 +60,46 @@
         android:layout_marginTop="28dp"
         android:layout_below="@+id/password_edit_text_registration"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/name_edit_text_registration"
+        android:hint="Name"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/spinnerRegistration"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/home_address_edit_text_registration"
+        android:hint="Home Address"
+        android:layout_below="@+id/name_edit_text_registration"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="18dp"
+        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/phone_number_edit_text_registration"
+        android:hint="Phone Number"
+        android:layout_below="@+id/home_address_edit_text_registration"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="22dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="phone" />
 </RelativeLayout>
