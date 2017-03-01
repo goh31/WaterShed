@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.example.haidangdam.watershed.R;
 import com.example.haidangdam.watershed.controller.fragment_list.ListViewFragmentAdmin;
@@ -19,13 +20,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
  * Created by haidangdam on 2/18/17.
  */
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
     static final int NUM_COUNTS = 3;
     ViewPager viewPager;
     TabLayout tabLayout;
     private GoogleApiClient mGoogleApiClient;
     MapFragmentWatershed mapFragment;
     MyAdapter myAdapter;
+    Toolbar toolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,8 @@ public class MainActivity extends FragmentActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Location"));
         tabLayout.addTab(tabLayout.newTab().setText("Profile"));
         tabLayout.setupWithViewPager(viewPager);
+        toolBar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolBar);
 
     }
 
