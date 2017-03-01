@@ -80,9 +80,6 @@ public class ListViewFragmentAdmin extends Fragment {
      */
     private double distanceFromCurrent(GeoLocation location) {
         double radius = 6378137;
-        if (location != null) {
-            Log.d("Watershed", "Location is not null");
-        }
         double deltaLat = currentLocation.getLatitude() - location.latitude;
         double deltaLon = currentLocation.getLongitude() - location.longitude;
         double angle = 2 * Math.asin(Math.sqrt(
@@ -209,10 +206,10 @@ public class ListViewFragmentAdmin extends Fragment {
                     Log.d("WaterShed app", "Press the button");
                     EventBus.getDefault().post(new GeoLocation(waterDataList.get(position).getL().get(0),
                             waterDataList.get(position).getL().get(1)));
-                    Fragment mapFragment = MapFragmentWatershed.newInstance();
+                    MapFragmentWatershed mapFragment = MapFragmentWatershed.newInstance();
                     FragmentTransaction transaction = ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
-                    transaction.addToBackStack(null);
                     transaction.replace(R.id.main_activity_worker_view_pager, mapFragment);
+                    transaction.addToBackStack(null);
                     transaction.commit();
                 }
             });

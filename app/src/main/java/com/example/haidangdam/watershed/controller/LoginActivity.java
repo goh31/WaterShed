@@ -199,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
      * If it is the right password, move to the main activity
      */
     private void processCorrectPasswordAndUsername() {
-        Intent intent = new Intent(this, NextActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 

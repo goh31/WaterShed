@@ -90,6 +90,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         if (container == null) {
             return null;
         }
+        Log.d("Watershed", "Create map fragment view");
         View v = inflator.inflate(R.layout.map_fragment_layout, container, false);
         mapView = (MapView) v.findViewById(R.id.mapview_admin_fragment_layout);
 
