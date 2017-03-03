@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.example.haidangdam.watershed.R;
 import com.example.haidangdam.watershed.controller.fragment_list.ListViewFragmentAdmin;
@@ -68,11 +69,17 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return MapFragmentWatershed.newInstance();
+                    if (mapFragmentMyAdapter == null) {
+                        Log.d("Watershed main activity", "Create new map fragment");
+                        return MapFragmentWatershed.newInstance();
+                    } else {
+                        Log.d("Watershed main activity", "Return the same fragment");
+                        return mapFragmentMyAdapter;
+                    }
                 case 1:
                     return ListViewFragmentAdmin.newInstance();
                 case 2:
-                    return MapFragmentWatershed.newInstance();
+                    return ListViewFragmentAdmin.newInstance();
                 default:
                     return null;
             }
@@ -97,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onActivityResult(requestCode, resultCode, intent);
         }
+    }
+
+    public void changeToMapFragment() {
+        Log.d("Watershed app", "Change To Map Fragment");
+        viewPager.setCurrentItem(0);
     }
 
 

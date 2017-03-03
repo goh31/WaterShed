@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.haidangdam.watershed.R;
+import com.example.haidangdam.watershed.controller.MainActivity;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -49,6 +50,7 @@ public class ListViewFragmentAdmin extends Fragment {
     ListLocationAdapter locationAdapter;
     private DatabaseReference waterDatabaseRef;
     int alreadyStart = 0;
+    private static MainActivity instanceMain;
     boolean allowToStart = false;
 
     public static ListViewFragmentAdmin newInstance() {
@@ -71,6 +73,7 @@ public class ListViewFragmentAdmin extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         locationAdapter = new ListLocationAdapter(getActivity(), waterDataList);
         recyclerView.setAdapter(locationAdapter);
+        instanceMain = (MainActivity) getActivity();
         return rootView;
     }
 
@@ -211,9 +214,15 @@ public class ListViewFragmentAdmin extends Fragment {
                     transaction.replace(R.id.main_activity_worker_view_pager, mapFragment);
                     transaction.addToBackStack(null);
                     transaction.commit();
+                    callMapFragment();
                 }
             });
             return viewHolder;
+        }
+
+        private void callMapFragment() {
+            Log.d("Watershed app", "List View call map fragment");
+            instanceMain.changeToMapFragment();
         }
 
         @Override
@@ -260,7 +269,7 @@ public class ListViewFragmentAdmin extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        waterResourceNearby.clear();
-        waterDataList.clear();
     }
+
+
 }

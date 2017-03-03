@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,6 +57,8 @@ import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -73,7 +77,8 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     GeoLocation destinationLocation;
     private boolean permissionDenied = false;
     private GoogleApiClient mGoogleApiClient;
-
+    int callMapDraw = 0;
+    int time = 0;
     /**
      * Instantiate the fragment
      *
@@ -95,10 +100,8 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         mapView = (MapView) v.findViewById(R.id.mapview_admin_fragment_layout);
 
         mapView.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-
-        }
-        mapView.onResume(); //get MapView display immediately
+        mapView.onResume();
+        //get MapView display immediately
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -107,7 +110,8 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(GoogleMap googleMap) {
+           public void onMapReady(GoogleMap googleMap) {
+                Log.d("Watershed", "Calling map async");
                 gMap = googleMap;
                 gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
@@ -121,22 +125,32 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             }
         });
         createLocationRequest();
+
         putUserInCurrentLocation();
+
         return v;
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
     }
 
     /**
      * Put the map point at the current location of the user
      */
     private void putUserInCurrentLocation() {
-        if (location != null) {
+        if (location != null && time == 0) {
             Log.d("Location", "Location is not null");
             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
             EventBus.getDefault().post(location);
             gMap.addMarker(new MarkerOptions().position(current).title("Current location"));
             gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, CITY));
+            time++;
         } else {
-            Log.d("Location", "location is null");
+            Log.d("Location", "not going to the if");
         }
     }
 
@@ -261,40 +275,50 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         mGoogleApiClient.connect();
     }
 
-    /**
+    /*
      * Calling this method when the fragment is first started (check the lifecycle for more information)
      */
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-        mGoogleApiClient.connect();
-    }
+    //@Override
+    //public void onStart() {
+        //super.onStart();
 
-    /**
-     * Use this method for EventBus when ListView return the item that the user choose to put into
-     *
-     * @param loc
-     */
-    @Subscribe
-    public void getNewLocation(GeoLocation loc) {
-        destinationLocation = loc;
-        String url = drawPolylineOnMapURL();
+    //}
 
-    }
 
-    /**
+     @Subscribe
+     public void getNewLocation(GeoLocation loc) {
+        if (callMapDraw == 0) {
+            destinationLocation = loc;
+            String url = drawPolylineOnMapURL();
+            gMap.addMarker(new MarkerOptions().position(new LatLng(destinationLocation.latitude,
+                destinationLocation.longitude)).title("stination"));
+            callMapDraw++;
+            MyAsyncTaskMapDownloading myAsyncTask = new MyAsyncTaskMapDownloading(getApplicationContext());
+            myAsyncTask.execute(drawPolylineOnMapURL());
+        }
+
+     }
+
+     /**
      * This method use to insert the query url for Google Map to return back regarding the user location
      * and his/her choice's destination.
      *
      * @returnMap String url for google map request
      */
     private String drawPolylineOnMapURL() {
-        String url = "https://maps.googleapis.com/maps/api/directions/" + "json"
-                + "?" + "origin=" + location.getLatitude() + ","
-                + location.getLongitude() + "&" + "destination="
-                + destinationLocation.latitude + "," + destinationLocation.longitude
-                + "&" + "sensor=false";
+        String str_origin = "origin="+location.getLatitude() +","+ location.getLongitude();
+        String str_dest = "destination="+destinationLocation.latitude+","+destinationLocation.longitude;
+        String sensor = "sensor=false";
+
+        //Adding Alternative parameter
+
+        // Building the parameters to the web service
+        String parameters = str_origin+"&"+str_dest+"&"+sensor;
+        String output = "json";
+
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&"
+                + "mode=walking";
+        Log.d("Watershed app", "Google Map: " + url);
         return url;
     }
 
@@ -315,6 +339,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
          */
         @Override
         protected void onPreExecute() {
+            Log.d("Watershed app", "Watershed app asynctask");
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Download from internet");
             progressDialog.show();
@@ -329,6 +354,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         @Override
         protected String doInBackground(String... args) {
             String data = "";
+            Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND + THREAD_PRIORITY_MORE_FAVORABLE);
             try {
                 data = downloadFromGoogle(args[0]);
             } catch (Exception e) {
@@ -381,7 +407,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             super.onPostExecute(result);
             ParserTask parse = new ParserTask();
             parse.execute(result);
-            progressDialog.hide();
+            progressDialog.dismiss();
         }
     }
 
@@ -392,9 +418,10 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
             JSONObject jObject;
-            List<List<HashMap<String, String>>> routesGoogleMap = null;
+            List<List<HashMap<String, String>>> routesGoogleMap = new ArrayList<>();
             try {
                 jObject = new JSONObject(jsonData[0]);
+
                 // Starts parsing data
                 routesGoogleMap = parse(jObject);
             } catch (Exception e) {
@@ -405,32 +432,30 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
 
         private List<List<HashMap<String, String>>> parse(JSONObject jobject) {
             List<List<HashMap<String, String>>> routesJSON = new ArrayList<List<HashMap<String, String>>>();
-            JSONArray jsonRoutes = null;
-            JSONArray jsonLegs = null;
-            JSONArray jsonSteps = null;
+            JSONArray jsonRoutes;
+            JSONArray jsonLegs;
+            JSONArray jsonSteps;
             try {
                 jsonRoutes = jobject.getJSONArray("routes");
-                /** Traversing all routes */
-                for (int i = 0; i < jsonRoutes.length(); i++) {
-                    jsonLegs = ((JSONObject) jsonRoutes.get(i)).getJSONArray("legs");
-                    List<HashMap<String, String>> pathJSON = new ArrayList<HashMap<String, String>>();
-                    /** Traversing all legs */
-                    for (int l = 0; l < jsonLegs.length(); l++) {
-                        jsonSteps = ((JSONObject) jsonLegs.getJSONObject(l)).getJSONArray("steps");
-                        /** Traversing all points */
+                for (int i  = 0; i < jsonRoutes.length(); i++) {
+                    jsonLegs = (JSONArray) ((JSONObject) jsonRoutes.get(i)).get("legs");
+                    List<HashMap<String, String>> legsJSONroutes = new ArrayList<>();
+                    for (int t = 0; t < jsonLegs.length(); t++) {
+                        jsonSteps = (JSONArray) ((JSONObject) jsonLegs.get(t)).get("steps");
                         for (int k = 0; k < jsonSteps.length(); k++) {
-                            String polyline = "";
-                            polyline = (String) ((JSONObject) ((JSONObject) jsonSteps.getJSONObject(k).get("polyline"))).get("points");
-                            List<LatLng> listCoordinate = decodePoly(polyline);
-                            for (int t = 0; l < listCoordinate.size(); t++) {
-                                HashMap<String, String> hashMap = new HashMap<>();
-                                hashMap.put("lat", Double.toString(listCoordinate.get(l).latitude));
-                                hashMap.put("lng", Double.toString(listCoordinate.get(l).longitude));
-                                pathJSON.add(hashMap);
+                            String polyline = (String) ((JSONObject) (((JSONObject) jsonSteps.get(k)).get("polyline"))).get("points");
+                            Log.d("Watershed app", "Current point in steps JSON " + k);
+                            List<LatLng> decoded = decodePoly(polyline);
+                            for (LatLng a : decoded) {
+                                HashMap<String, String> pointsDecoded = new HashMap<>();
+                                pointsDecoded.put("lat", "" + a.latitude);
+                                pointsDecoded.put("lng", "" + a.longitude);
+                                legsJSONroutes.add(pointsDecoded);
                             }
                         }
-                        routesJSON.add(pathJSON);
                     }
+                    routesJSON.add(legsJSONroutes);
+
                 }
             } catch (Exception e) {
                 Log.d("Parse JSON ParserTask", "Error while parsing JSON " + e.toString());
@@ -445,56 +470,18 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
          * @return List of LatLng position for the
          */
         private List<LatLng> decodePoly(String encoded) {
-            List<LatLng> poly = new ArrayList<>();
-            int index = 0;
-            int len = encoded.length();
-            int lat = 0;
-            int lng = 0;
-
-            while (index < len) {
-                int b;
-                int shift = 0;
-                int result = 0;
-                do {
-                    b = encoded.charAt(index++) - 63;
-                    result |= (b & 0x1f) << shift;
-                    shift = shift + 5;
-                } while (b >= 0x20);
-                int dLat;
-                if ((result & 1) != 0) {
-                    dLat = ~(result >> 1);
-                } else {
-                    dLat = result >> 1;
-                }
-                lat = lat + dLat;
-                shift = 0;
-                result = 0;
-                do {
-                    b = encoded.charAt(index++) - 63;
-                    result |= (b & 0x1f) << shift;
-                    shift = shift + 5;
-                } while (b >= 0x20);
-                int dLng;
-                if ((result & 1) != 0) {
-                    dLng = ~(result >> 1);
-                } else {
-                    dLng = result >> 1;
-                }
-                lng = lng + dLng;
-                LatLng p = new LatLng(((double) lat / 1E5), ((double) lng / 1E5));
-                poly.add(p);
-            }
-            return poly;
+            List<LatLng> decodedPath = PolyUtil.decode(encoded);
+            return decodedPath;
         }
 
         // Draw the Polyline on the Map
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             ArrayList<LatLng> points;
-            PolylineOptions lineOptions = null;
+            PolylineOptions lineOptions = new PolylineOptions();
             for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList<LatLng>();
-                lineOptions = new PolylineOptions();
+                Log.d("Watershed app", "Draw Polyline");
                 List<HashMap<String, String>> path = result.get(i);
                 for (int j = 0; j < path.size(); j++) {
                     HashMap<String, String> point = path.get(j);
@@ -505,7 +492,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
                     points.add(position);
                 }
                 lineOptions.addAll(points);
-                lineOptions.width(10);
+                lineOptions.width(15);
                 lineOptions.color(Color.RED);
 
                 Log.d("Parser Task Map", "onPostExecute finish modifying lineOptions");
@@ -518,10 +505,10 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             }
         }
     }
-
     @Override
     public void onPause() {
         super.onPause();
         EventBus.getDefault().unregister(this);
     }
+
 }
