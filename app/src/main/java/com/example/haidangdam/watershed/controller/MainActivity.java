@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.main_activity_worker_view_pager);
         viewPager.setAdapter(new MyAdapter(getSupportFragmentManager(), MainActivity.this));
+        viewPager.setOffscreenPageLimit(3);
         myAdapter = (MyAdapter) viewPager.getAdapter();
         mapFragment = myAdapter.getMapFragment();
         tabLayout = (TabLayout) findViewById(R.id.main_activity_worker_tab_layout);
@@ -67,11 +68,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            Log.d("Watershed app", "Get Item in Main Activity");
             switch (position) {
                 case 0:
                     if (mapFragmentMyAdapter == null) {
                         Log.d("Watershed main activity", "Create new map fragment");
-                        return MapFragmentWatershed.newInstance();
+                        mapFragmentMyAdapter = MapFragmentWatershed.newInstance();
+                        return mapFragmentMyAdapter;
                     } else {
                         Log.d("Watershed main activity", "Return the same fragment");
                         return mapFragmentMyAdapter;

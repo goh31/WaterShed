@@ -135,6 +135,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("Watershed app", "calling onCreate");
         EventBus.getDefault().register(this);
     }
 
@@ -239,11 +240,11 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     /**
      * When the device succesfully connect to the api (client is ready)
      *
-     * @param connetionHint
+     * @param connectionHint
      */
     @Override
-    public void onConnected(Bundle connetionHint) {
-        Log.d("Connected", "Google API connected");
+    public void onConnected(Bundle connectionHint) {
+        Log.d("Watershed ", "app calling onConnected");
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
     }
 
@@ -254,6 +255,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
      */
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("Watershed app", "calling onLocationChanged");
         this.location = location;
         putUserInCurrentLocation();
     }
@@ -291,7 +293,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             destinationLocation = loc;
             String url = drawPolylineOnMapURL();
             gMap.addMarker(new MarkerOptions().position(new LatLng(destinationLocation.latitude,
-                destinationLocation.longitude)).title("stination"));
+                destinationLocation.longitude)).title("destination"));
             callMapDraw++;
             MyAsyncTaskMapDownloading myAsyncTask = new MyAsyncTaskMapDownloading(getApplicationContext());
             myAsyncTask.execute(drawPolylineOnMapURL());
@@ -508,7 +510,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     @Override
     public void onPause() {
         super.onPause();
-        EventBus.getDefault().unregister(this);
+        Log.d("Watershed", "Map fragment on Pause");
     }
 
 }
