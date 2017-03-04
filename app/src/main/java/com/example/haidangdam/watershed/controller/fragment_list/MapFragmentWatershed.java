@@ -1,7 +1,6 @@
 package com.example.haidangdam.watershed.controller.fragment_list;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -79,6 +78,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     private GoogleApiClient mGoogleApiClient;
     int callMapDraw = 0;
     int time = 0;
+    View v;
     /**
      * Instantiate the fragment
      *
@@ -96,7 +96,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             return null;
         }
         Log.d("Watershed", "Create map fragment view");
-        View v = inflator.inflate(R.layout.map_fragment_layout, container, false);
+        v = inflator.inflate(R.layout.map_fragment_layout, container, false);
         mapView = (MapView) v.findViewById(R.id.mapview_admin_fragment_layout);
 
         mapView.onCreate(savedInstanceState);
@@ -135,7 +135,8 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("Watershed app", "calling onCreate");
+        Log.d("Watershed app", "calling onCreate map Fragment");
+        setRetainInstance(true);
         EventBus.getDefault().register(this);
     }
 
@@ -329,7 +330,6 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
      * result back
      */
     private class MyAsyncTaskMapDownloading extends AsyncTask<String, Void, String> {
-        ProgressDialog progressDialog;
         Context context;
 
         public MyAsyncTaskMapDownloading(Context context) {
@@ -342,9 +342,6 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         @Override
         protected void onPreExecute() {
             Log.d("Watershed app", "Watershed app asynctask");
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Download from internet");
-            progressDialog.show();
         }
 
         /**
@@ -409,7 +406,6 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             super.onPostExecute(result);
             ParserTask parse = new ParserTask();
             parse.execute(result);
-            progressDialog.dismiss();
         }
     }
 
@@ -512,5 +508,15 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         super.onPause();
         Log.d("Watershed", "Map fragment on Pause");
     }
+
+
+    @Override
+    public void onDetach() {
+        Log.d("Watershed app", "Map fragment onDestroy()");
+        super.onDetach();
+    }
+
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.haidangdam.watershed.controller;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.main_activity_worker_view_pager);
         viewPager.setAdapter(new MyAdapter(getSupportFragmentManager(), MainActivity.this));
-        viewPager.setOffscreenPageLimit(3);
         myAdapter = (MyAdapter) viewPager.getAdapter();
         mapFragment = myAdapter.getMapFragment();
+        viewPager.setOffscreenPageLimit(2);
         tabLayout = (TabLayout) findViewById(R.id.main_activity_worker_tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Map"));
         tabLayout.addTab(tabLayout.newTab().setText("Location"));
@@ -74,11 +75,8 @@ public class MainActivity extends AppCompatActivity {
                     if (mapFragmentMyAdapter == null) {
                         Log.d("Watershed main activity", "Create new map fragment");
                         mapFragmentMyAdapter = MapFragmentWatershed.newInstance();
-                        return mapFragmentMyAdapter;
-                    } else {
-                        Log.d("Watershed main activity", "Return the same fragment");
-                        return mapFragmentMyAdapter;
                     }
+                    return mapFragmentMyAdapter;
                 case 1:
                     return ListViewFragmentAdmin.newInstance();
                 case 2:
@@ -92,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
             return mapFragmentMyAdapter;
         }
 
+        public void setMapFragment(MapFragmentWatershed mapFragment) {
+            this.mapFragmentMyAdapter = mapFragment;
+            ((Activity) ctx).getFragmentManager().popBackStackImmediate();
+        }
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -109,11 +111,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void changeToMapFragment() {
+    public void changeToMapFragment(MapFragmentWatershed fragment) {
         Log.d("Watershed app", "Change To Map Fragment");
-        viewPager.setCurrentItem(0);
+        myAdapter.setMapFragment(fragment);
+        viewPager.setCurrentItem(0, true);
     }
 
+    public MapFragmentWatershed getMapFragment() {
+        if (mapFragment == null) {
+            Log.d("Watershed app", "Map Fragment is null");
+        }
+        return mapFragment;
+    }
 
 }
 

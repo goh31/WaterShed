@@ -206,23 +206,22 @@ public class ListViewFragmentAdmin extends Fragment {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("WaterShed app", "Press the button");
                     EventBus.getDefault().post(new GeoLocation(waterDataList.get(position).getL().get(0),
                             waterDataList.get(position).getL().get(1)));
                     MapFragmentWatershed mapFragment = MapFragmentWatershed.newInstance();
                     FragmentTransaction transaction = ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.main_activity_worker_view_pager, mapFragment);
-                    transaction.addToBackStack(null);
+                    transaction.add(R.id.main_activity_worker_view_pager, mapFragment); // work but buggy
+                    transaction.addToBackStack("list ");
                     transaction.commit();
-                    callMapFragment();
+                    callMapFragment(mapFragment);
                 }
             });
             return viewHolder;
         }
 
-        private void callMapFragment() {
+        private void callMapFragment(MapFragmentWatershed fragment) {
             Log.d("Watershed app", "List View call map fragment");
-            instanceMain.changeToMapFragment();
+            instanceMain.changeToMapFragment(fragment);
         }
 
         @Override
@@ -265,11 +264,5 @@ public class ListViewFragmentAdmin extends Fragment {
 
         }
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
 
 }
