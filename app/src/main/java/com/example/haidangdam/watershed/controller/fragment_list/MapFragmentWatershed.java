@@ -288,6 +288,10 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     //}
 
 
+    /**
+     *
+     * @param loc
+     */
      @Subscribe
      public void getNewLocation(GeoLocation loc) {
         if (callMapDraw == 0) {
@@ -428,6 +432,11 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             return routesGoogleMap;
         }
 
+        /**
+         *
+         * @param jobject
+         * @return
+         */
         private List<List<HashMap<String, String>>> parse(JSONObject jobject) {
             List<List<HashMap<String, String>>> routesJSON = new ArrayList<List<HashMap<String, String>>>();
             JSONArray jsonRoutes;
@@ -515,8 +524,4 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         Log.d("Watershed app", "Map fragment onDestroy()");
         super.onDetach();
     }
-
-
-
-
 }

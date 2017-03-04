@@ -98,7 +98,6 @@ public class ListViewFragmentAdmin extends Fragment {
      */
     private void getDatabaseWithLocation() {
         Log.d("WaterShed", "getDatabaseWithLocation intialize");
-        Log.d("Haidang", "Dam");
         waterDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -123,8 +122,6 @@ public class ListViewFragmentAdmin extends Fragment {
                     });
                 }
                 Log.d("WaterShed app", "Finish retrieving data from database");
-
-
             }
 
             @Override
@@ -150,6 +147,9 @@ public class ListViewFragmentAdmin extends Fragment {
         }
     }
 
+    /**
+     *
+     */
     private void setupGeoFire() {
         geoFire = new GeoFire(waterDatabaseRef);
         // In the future, let the user decide where they want to be.
@@ -182,17 +182,29 @@ public class ListViewFragmentAdmin extends Fragment {
             @Override
             public void onGeoQueryReady() {
                 getDatabaseWithLocation();
+                EventBus.getDefault().post(waterResourceNearby);
                 Log.d("WaterShed app", "All key data has been loaded and events have bee fired");
                 geoQuery.removeAllListeners();
             }
         });
     }
 
+    public Set<String> getListWaterResourceNearby() {
+        return waterResourceNearby;
+    }
+  /**
+     *
+     */
     public static class ListLocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private List<WaterData> waterDataList;
         private Context mContext;
         int position;
 
+        /**
+         *
+         * @param context
+         * @param waterDataList
+         */
         public ListLocationAdapter(Context context, List<WaterData> waterDataList) {
             this.waterDataList = waterDataList;
             this.mContext = context;
@@ -219,6 +231,10 @@ public class ListViewFragmentAdmin extends Fragment {
             return viewHolder;
         }
 
+        /**
+         *
+         * @param fragment
+         */
         private void callMapFragment(MapFragmentWatershed fragment) {
             Log.d("Watershed app", "List View call map fragment");
             instanceMain.changeToMapFragment(fragment);
@@ -244,20 +260,36 @@ public class ListViewFragmentAdmin extends Fragment {
         }
 
 
-
+        /**
+         *
+         */
         class ListLocationViewHolder extends RecyclerView.ViewHolder{
             protected TextView LocationName;
             protected TextView criticalLevel;
+
+            /**
+             *
+             * @param itemView
+             */
             public ListLocationViewHolder(View itemView) {
                 super(itemView);
                 this.LocationName = (TextView) itemView.findViewById(R.id.name_view_item_text);
                 this.criticalLevel = (TextView) itemView.findViewById(R.id.water_level_item_text);
             }
 
+
+            /**
+             *
+             * @return
+             */
             public TextView getLocationTextView() {
                 return LocationName;
             }
 
+            /**
+             *
+             * @return
+             */
             public TextView getCriticalLevelTextView() {
                 return criticalLevel;
             }

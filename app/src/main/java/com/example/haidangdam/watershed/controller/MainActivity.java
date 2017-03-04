@@ -12,11 +12,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.haidangdam.watershed.R;
 import com.example.haidangdam.watershed.controller.fragment_list.ListViewFragmentAdmin;
 import com.example.haidangdam.watershed.controller.fragment_list.MapFragmentWatershed;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.util.ArrayList;
 
 /**
  * Created by haidangdam on 2/18/17.
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     MapFragmentWatershed mapFragment;
     MyAdapter myAdapter;
     Toolbar toolBar;
+    public static final String ARRAY_LIST_KEY = "stringArray";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +56,40 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_add: {
+                Log.d("Watershed", "Touch the add button");
+                Intent intent = new Intent(MainActivity.this, AddReportActivity.class);
+                Bundle bundle = new Bundle();
+                ArrayList<String> arrayList = new ArrayList<String>();
+                arrayList.addAll(myAdapter.getListViewFragmentAdmin().getListWaterResourceNearby());
+                if (arrayList.size() != 0) {
+                    Log.d("Watershed", "Array List size: " + arrayList.size());
+                }
+                bundle.putStringArrayList(ARRAY_LIST_KEY, arrayList);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                return true;
+            }
+            default: return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    /**
+     *
+     */
     public static class MyAdapter extends FragmentPagerAdapter {
         MapFragmentWatershed mapFragmentMyAdapter;
+        ListViewFragmentAdmin listViewFragment;
         private String[] field = new String[]{"Map", "Location", "Profile"};
         Context ctx;
 
@@ -78,7 +115,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return mapFragmentMyAdapter;
                 case 1:
-                    return ListViewFragmentAdmin.newInstance();
+                    if (listViewFragment == null) {
+                        listViewFragment = ListViewFragmentAdmin.newInstance();
+                    }
+                    return listViewFragment;
                 case 2:
                     return ListViewFragmentAdmin.newInstance();
                 default:
@@ -86,10 +126,22 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         *
+         * @return
+         */
         public MapFragmentWatershed getMapFragment() {
             return mapFragmentMyAdapter;
         }
 
+        public ListViewFragmentAdmin getListViewFragmentAdmin() {
+            return listViewFragment;
+        }
+
+        /**
+         *
+         * @param mapFragment
+         */
         public void setMapFragment(MapFragmentWatershed mapFragment) {
             this.mapFragmentMyAdapter = mapFragment;
             ((Activity) ctx).getFragmentManager().popBackStackImmediate();
@@ -111,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     * @param fragment
+     */
     public void changeToMapFragment(MapFragmentWatershed fragment) {
         Log.d("Watershed app", "Change To Map Fragment");
         myAdapter.setMapFragment(fragment);
@@ -123,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return mapFragment;
     }
-
 }
 
 

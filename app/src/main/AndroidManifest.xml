@@ -22,15 +22,20 @@
             android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
             android:name=".controller.NextActivity"
             android:label="Next Activity" />
-        <activity android:name=".controller.MainActivity"></activity>
+        <activity android:name=".controller.MainActivity"
+            android:label="Main Activity">
+        </activity>
         <activity android:name=".controller.RegistrationActivity"></activity>
+        <activity android:name=".controller.AddReportActivity"
+            android:label="Add Report"
+            android:parentActivityName=".controller.MainActivity"></activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -43,7 +48,6 @@
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:label="@string/app_name" />
-
     </application>
 
 </manifest>

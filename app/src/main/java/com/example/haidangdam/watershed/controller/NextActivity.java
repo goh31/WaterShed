@@ -87,6 +87,9 @@ public class NextActivity extends Activity {
         startActivity(intent);
     }
 
+    /**
+     *
+     */
     private void goToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
