@@ -27,19 +27,20 @@ import java.util.ArrayList;
 import model.User;
 
 public class RegistrationActivity extends AppCompatActivity {
+    public static final String password = "PASSWORD";
+    public static final String username = "USERNAME";
+    public static final String PATH_USER = "userID";
     EditText emailEditText;
     EditText passwordEditText;
     Button registrationButton;
-    private FirebaseAuth mAuth;
-    private ProgressDialog progressDialog;
-    public static final String password = "PASSWORD";
-    public static final String username = "USERNAME";
     DatabaseReference databaseUser;
-    public static final String PATH_USER= "userID";
     Spinner spinnerRegistration;
     EditText phoneNumberRegistration;
     EditText nameRegistration;
     EditText addressRegistration;
+    private FirebaseAuth mAuth;
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +74,6 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     /**
-     *
      * @return validate the field if any is left empty
      */
     private boolean validateField() {
@@ -95,18 +95,18 @@ public class RegistrationActivity extends AppCompatActivity {
         Log.d("1", "something");
         mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(),
                 passwordEditText.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(),
-                                    "Authentication failed: " + task.getException().toString(), Toast.LENGTH_LONG).show();
-                        } else {
-                            Log.d("Sign up sucessful", "Sign up successful");
-                            FirebaseUser user = task.getResult().getUser();
-                            addToDatabase(user.getUid());
-                        }
-                    }
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                progressDialog.dismiss();
+                if (!task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(),
+                            "Authentication failed: " + task.getException().toString(), Toast.LENGTH_LONG).show();
+                } else {
+                    Log.d("Sign up sucessful", "Sign up successful");
+                    FirebaseUser user = task.getResult().getUser();
+                    addToDatabase(user.getUid());
+                }
+            }
 
         });
     }

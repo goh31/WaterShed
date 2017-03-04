@@ -74,15 +74,16 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
     LocationRequest locationRequest;
     Location location;
     GeoLocation destinationLocation;
-    private boolean permissionDenied = false;
-    private GoogleApiClient mGoogleApiClient;
     int callMapDraw = 0;
     int time = 0;
     View v;
+    private boolean permissionDenied = false;
+    private GoogleApiClient mGoogleApiClient;
+
     /**
      * Instantiate the fragment
      *
-     * @return
+     * @return the MapFragmentWatershed instance
      */
     public static MapFragmentWatershed newInstance() {
         MapFragmentWatershed mapFragment = new MapFragmentWatershed();
@@ -110,7 +111,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-           public void onMapReady(GoogleMap googleMap) {
+            public void onMapReady(GoogleMap googleMap) {
                 Log.d("Watershed", "Calling map async");
                 gMap = googleMap;
                 gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
@@ -283,50 +284,61 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
      */
     //@Override
     //public void onStart() {
-        //super.onStart();
+    //super.onStart();
 
     //}
 
 
     /**
-     *
      * @param loc
      */
-     @Subscribe
-     public void getNewLocation(GeoLocation loc) {
+    @Subscribe
+    public void getNewLocation(GeoLocation loc) {
         if (callMapDraw == 0) {
             destinationLocation = loc;
             String url = drawPolylineOnMapURL();
             gMap.addMarker(new MarkerOptions().position(new LatLng(destinationLocation.latitude,
-                destinationLocation.longitude)).title("destination"));
+                    destinationLocation.longitude)).title("destination"));
             callMapDraw++;
             MyAsyncTaskMapDownloading myAsyncTask = new MyAsyncTaskMapDownloading(getApplicationContext());
             myAsyncTask.execute(drawPolylineOnMapURL());
         }
 
-     }
+    }
 
-     /**
+    /**
      * This method use to insert the query url for Google Map to return back regarding the user location
      * and his/her choice's destination.
      *
      * @returnMap String url for google map request
      */
     private String drawPolylineOnMapURL() {
-        String str_origin = "origin="+location.getLatitude() +","+ location.getLongitude();
-        String str_dest = "destination="+destinationLocation.latitude+","+destinationLocation.longitude;
+        String str_origin = "origin=" + location.getLatitude() + "," + location.getLongitude();
+        String str_dest = "destination=" + destinationLocation.latitude + "," + destinationLocation.longitude;
         String sensor = "sensor=false";
 
         //Adding Alternative parameter
 
         // Building the parameters to the web service
-        String parameters = str_origin+"&"+str_dest+"&"+sensor;
+        String parameters = str_origin + "&" + str_dest + "&" + sensor;
         String output = "json";
 
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&"
                 + "mode=walking";
         Log.d("Watershed app", "Google Map: " + url);
         return url;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("Watershed", "Map fragment on Pause");
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("Watershed app", "Map fragment onDestroy()");
+        super.onDetach();
     }
 
     /**
@@ -433,9 +445,10 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
         }
 
         /**
+         * Parsing the JSON Object into a list of coordinate so that we can draw on the Google Map
          *
-         * @param jobject
-         * @return
+         * @param jobject JSONObject that we get directly from the JSON file that Google give
+         * @return List of Coordinate in List<List<HashMap<String, String>>> form
          */
         private List<List<HashMap<String, String>>> parse(JSONObject jobject) {
             List<List<HashMap<String, String>>> routesJSON = new ArrayList<List<HashMap<String, String>>>();
@@ -444,7 +457,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
             JSONArray jsonSteps;
             try {
                 jsonRoutes = jobject.getJSONArray("routes");
-                for (int i  = 0; i < jsonRoutes.length(); i++) {
+                for (int i = 0; i < jsonRoutes.length(); i++) {
                     jsonLegs = (JSONArray) ((JSONObject) jsonRoutes.get(i)).get("legs");
                     List<HashMap<String, String>> legsJSONroutes = new ArrayList<>();
                     for (int t = 0; t < jsonLegs.length(); t++) {
@@ -511,17 +524,5 @@ public class MapFragmentWatershed extends Fragment implements LocationListener, 
                 Log.d("Parser Task Map", "polyline not drawn because it is null");
             }
         }
-    }
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d("Watershed", "Map fragment on Pause");
-    }
-
-
-    @Override
-    public void onDetach() {
-        Log.d("Watershed app", "Map fragment onDestroy()");
-        super.onDetach();
     }
 }

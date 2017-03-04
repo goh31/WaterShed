@@ -26,6 +26,7 @@ import model.User;
  */
 
 public class NextActivity extends Activity {
+    public static final String TAG = "MainView";
     Button logOffButton;
     Button updateButton;
     Button nextToActivity;
@@ -36,9 +37,8 @@ public class NextActivity extends Activity {
     User user;
     String uId;
     String credential;
-    public static final String TAG = "MainView";
-    private DatabaseReference WaterDatabaseReference;
     ProgressDialog progressDialog;
+    private DatabaseReference WaterDatabaseReference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class NextActivity extends Activity {
         homeAddressField = (EditText) findViewById(R.id.homeAddressField);
         phoneNumberField = (EditText) findViewById(R.id.phoneNumberField);
         logOffButton = (Button) findViewById(R.id.log_off_button);
-        logOffButton.setOnClickListener(new View.OnClickListener(){
+        logOffButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goBackToLogin();
@@ -96,7 +96,7 @@ public class NextActivity extends Activity {
     }
 
     private void populateFieldView(String uId) {
-       WaterDatabaseReference.child(uId).addValueEventListener(new ValueEventListener() {
+        WaterDatabaseReference.child(uId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 user = (User) snapshot.getValue(User.class);
@@ -106,11 +106,11 @@ public class NextActivity extends Activity {
                 credential = user.getCredential();
             }
 
-           @Override
-           public void onCancelled(DatabaseError errr) {
-               Log.d("Watershed", "error: "+ errr.getMessage());
-           }
-       });
+            @Override
+            public void onCancelled(DatabaseError errr) {
+                Log.d("Watershed", "error: " + errr.getMessage());
+            }
+        });
     }
 
     private void updateDatabase() {

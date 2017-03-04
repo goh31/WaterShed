@@ -27,14 +27,14 @@ import java.util.ArrayList;
  */
 
 public class MainActivity extends AppCompatActivity {
+    public static final String ARRAY_LIST_KEY = "stringArray";
     static final int NUM_COUNTS = 3;
     ViewPager viewPager;
     TabLayout tabLayout;
-    private GoogleApiClient mGoogleApiClient;
     MapFragmentWatershed mapFragment;
     MyAdapter myAdapter;
     Toolbar toolBar;
-    public static final String ARRAY_LIST_KEY = "stringArray";
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.action_add: {
                 Log.d("Watershed", "Touch the add button");
                 Intent intent = new Intent(MainActivity.this, AddReportActivity.class);
@@ -79,20 +79,58 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             }
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
 
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == MapFragmentWatershed.REQUEST_CODE) {
+            mapFragment.onActivityResult(requestCode, resultCode, intent);
+        } else {
+            super.onActivityResult(requestCode, resultCode, intent);
+        }
+    }
+
     /**
+     * Set tab to change the map fragment from list view
      *
+     * @param fragment the map fragment that we get from the list view
+     */
+    public void changeToMapFragment(MapFragmentWatershed fragment) {
+        Log.d("Watershed app", "Change To Map Fragment");
+        myAdapter.setMapFragment(fragment);
+        viewPager.setCurrentItem(0, true);
+    }
+
+    /**
+     * Return MapFragmentWatershed object in the activity in case any class needs to access
+     *
+     * @return MapFragmentWatershed object
+     */
+    public MapFragmentWatershed getMapFragment() {
+        if (mapFragment == null) {
+            Log.d("Watershed app", "Map Fragment is null");
+        }
+        return mapFragment;
+    }
+
+    /**
+     * Create a Fragment Pager Adapter for the list of fragment under the tab
      */
     public static class MyAdapter extends FragmentPagerAdapter {
         MapFragmentWatershed mapFragmentMyAdapter;
         ListViewFragmentAdmin listViewFragment;
-        private String[] field = new String[]{"Map", "Location", "Profile"};
         Context ctx;
+        private String[] field = new String[]{"Map", "Location", "Profile"};
 
+        /**
+         * Constructor for Fragment Pager Adapter
+         * @param fm Fragment Manager from the current activity
+         * @param ctx The context of the current activity
+         */
         public MyAdapter(FragmentManager fm, Context ctx) {
             super(fm);
             this.ctx = ctx;
@@ -127,18 +165,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /**
+         * Get the map fragment currently exist in the main activity
          *
-         * @return
+         * @return MapFragment object
          */
         public MapFragmentWatershed getMapFragment() {
             return mapFragmentMyAdapter;
         }
 
-        public ListViewFragmentAdmin getListViewFragmentAdmin() {
-            return listViewFragment;
-        }
-
         /**
+         * Set the map Fragment to the new map fragment when we update the map with direction
          *
          * @param mapFragment
          */
@@ -147,37 +183,20 @@ public class MainActivity extends AppCompatActivity {
             ((Activity) ctx).getFragmentManager().popBackStackImmediate();
         }
 
+        /**
+         * Get the ListViewFragmentAdmin that currently exist in the main activity
+         *
+         * @return ListViewFragmentAdmin object
+         */
+        public ListViewFragmentAdmin getListViewFragmentAdmin() {
+            return listViewFragment;
+        }
+
         @Override
         public CharSequence getPageTitle(int position) {
             return field[position];
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == MapFragmentWatershed.REQUEST_CODE) {
-            mapFragment.onActivityResult(requestCode, resultCode, intent);
-        } else {
-            super.onActivityResult(requestCode, resultCode, intent);
-        }
-    }
-
-    /**
-     *
-     * @param fragment
-     */
-    public void changeToMapFragment(MapFragmentWatershed fragment) {
-        Log.d("Watershed app", "Change To Map Fragment");
-        myAdapter.setMapFragment(fragment);
-        viewPager.setCurrentItem(0, true);
-    }
-
-    public MapFragmentWatershed getMapFragment() {
-        if (mapFragment == null) {
-            Log.d("Watershed app", "Map Fragment is null");
-        }
-        return mapFragment;
     }
 }
 

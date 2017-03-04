@@ -41,17 +41,17 @@ import static android.R.id.list;
 
 
 public class ListViewFragmentAdmin extends Fragment {
-    RecyclerView recyclerView;
     public static Location currentLocation;
+    private static MainActivity instanceMain;
+    RecyclerView recyclerView;
     GeoQuery geoQuery;
     GeoFire geoFire;
+    ListLocationAdapter locationAdapter;
+    int alreadyStart = 0;
+    boolean allowToStart = false;
     private Set<String> waterResourceNearby;
     private ArrayList<WaterData> waterDataList;
-    ListLocationAdapter locationAdapter;
     private DatabaseReference waterDatabaseRef;
-    int alreadyStart = 0;
-    private static MainActivity instanceMain;
-    boolean allowToStart = false;
 
     public static ListViewFragmentAdmin newInstance() {
         ListViewFragmentAdmin a = new ListViewFragmentAdmin();
@@ -133,7 +133,9 @@ public class ListViewFragmentAdmin extends Fragment {
     }
 
     /**
-     * @param location
+     * Communicating with map to get the current location
+     *
+     * @param location The location that got from the map indicating the current location
      */
     @Subscribe
     public void getLocationDataFromMap(Location location) {
@@ -148,7 +150,7 @@ public class ListViewFragmentAdmin extends Fragment {
     }
 
     /**
-     *
+     * Set up GeoFire to query the current location and find a list of location nearby
      */
     private void setupGeoFire() {
         geoFire = new GeoFire(waterDatabaseRef);
@@ -192,18 +194,20 @@ public class ListViewFragmentAdmin extends Fragment {
     public Set<String> getListWaterResourceNearby() {
         return waterResourceNearby;
     }
-  /**
-     *
+
+    /**
+     * Recycler View Adapter class that we implement for the list view
      */
     public static class ListLocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        int position;
         private List<WaterData> waterDataList;
         private Context mContext;
-        int position;
 
         /**
+         * Public constructor for the adapter
          *
-         * @param context
-         * @param waterDataList
+         * @param context       the current context of the activity
+         * @param waterDataList the list of water data that we get from GeoFire
          */
         public ListLocationAdapter(Context context, List<WaterData> waterDataList) {
             this.waterDataList = waterDataList;
@@ -232,8 +236,9 @@ public class ListViewFragmentAdmin extends Fragment {
         }
 
         /**
+         * Calling map fragment to show the direction when pressing to the child in the RecyclerView
          *
-         * @param fragment
+         * @param fragment the mapfragment that we created when we add to the stack when clicking on the child
          */
         private void callMapFragment(MapFragmentWatershed fragment) {
             Log.d("Watershed app", "List View call map fragment");
@@ -261,15 +266,16 @@ public class ListViewFragmentAdmin extends Fragment {
 
 
         /**
-         *
+         * The Recycler View's ViewHolder
          */
-        class ListLocationViewHolder extends RecyclerView.ViewHolder{
+        class ListLocationViewHolder extends RecyclerView.ViewHolder {
             protected TextView LocationName;
             protected TextView criticalLevel;
 
             /**
+             * The constructor of the view holder
              *
-             * @param itemView
+             * @param itemView the view that we get
              */
             public ListLocationViewHolder(View itemView) {
                 super(itemView);
@@ -279,16 +285,18 @@ public class ListViewFragmentAdmin extends Fragment {
 
 
             /**
+             * The Location TextView in the child view
              *
-             * @return
+             * @return the location TextView in the child view
              */
             public TextView getLocationTextView() {
                 return LocationName;
             }
 
             /**
+             * Get the Critical Level TextView in the child view
              *
-             * @return
+             * @return the critical level TextView in the child view
              */
             public TextView getCriticalLevelTextView() {
                 return criticalLevel;
