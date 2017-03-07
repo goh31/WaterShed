@@ -9,13 +9,13 @@ import java.util.ArrayList;
 
 public class WaterData {
     String name;
-    double drinkingLevel;
+    ArrayList<Double> drinkingLevel;
     ArrayList<Double> l;
     String g;
 
     public WaterData() {
     }
-    public WaterData(String name, ArrayList<Double> l,  double drinkingLevel, String g) {
+    public WaterData(String name, ArrayList<Double> l,  ArrayList<Double> drinkingLevel, String g) {
         this.name = name;
         this.g = g;
         this.drinkingLevel = drinkingLevel;
@@ -29,13 +29,14 @@ public class WaterData {
     public void setlocationName(String name) {
         this.name = name;
     }
-    public double getcriticalLevel() {
+    public ArrayList<Double> getcriticalLevel() {
         return this.drinkingLevel;
     }
 
-    public void setcriticalLevel(double a) {
-        this.drinkingLevel = a;
+    public void setcriticalLevel(ArrayList<Double> a) {
+        drinkingLevel = a;
     }
+
     public ArrayList<Double> getL() {
         return l;
     }

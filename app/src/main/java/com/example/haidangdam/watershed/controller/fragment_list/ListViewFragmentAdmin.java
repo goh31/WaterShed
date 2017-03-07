@@ -211,13 +211,14 @@ public class ListViewFragmentAdmin extends Fragment {
          */
         public ListLocationAdapter(Context context, List<WaterData> waterDataList) {
             this.waterDataList = waterDataList;
-            this.mContext = context;
+            this.mContext =        context;
         }
 
         @Override
         public ListLocationViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_list_view, null);
             position = i;
+            Log.d("Watershed app", "Press at the location " + i);
             ListLocationViewHolder viewHolder = new ListLocationViewHolder(view);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -227,7 +228,7 @@ public class ListViewFragmentAdmin extends Fragment {
                     MapFragmentWatershed mapFragment = MapFragmentWatershed.newInstance();
                     FragmentTransaction transaction = ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
                     transaction.add(R.id.main_activity_worker_view_pager, mapFragment); // work but buggy
-                    transaction.addToBackStack("list ");
+                    transaction.addToBackStack("list");
                     transaction.commit();
                     callMapFragment(mapFragment);
                 }
@@ -249,7 +250,8 @@ public class ListViewFragmentAdmin extends Fragment {
         public void onBindViewHolder(RecyclerView.ViewHolder customViewHolder, int i) {
             WaterData data = waterDataList.get(i);
             ((ListLocationViewHolder) customViewHolder).criticalLevel.
-                    setText("The Level of water is " + data.getcriticalLevel());
+                    setText("The Level of water is " + data.getcriticalLevel().
+                            get(data.getcriticalLevel().size() - 1));
             ((ListLocationViewHolder) customViewHolder).LocationName.setText(data.getlocationName());
         }
 

@@ -14,11 +14,15 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 
 import com.example.haidangdam.watershed.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
+import model.WaterData;
 
 /**
  * Created by haidangdam on 3/3/17.
@@ -35,6 +39,7 @@ public class AddReportActivity extends AppCompatActivity {
     int seekBarValue;
     int i = 0;
     ProgressDialog progressDialog;
+    ArrayList<Double> newArrayData;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +84,20 @@ public class AddReportActivity extends AppCompatActivity {
             }
 
         });
+        databaseReference.child(locationAvailable.getSelectedItem().toString()).
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        WaterData data = (WaterData) dataSnapshot.getValue(WaterData.class);
+                        newArrayData = data.getcriticalLevel();
+                        Log.d("Watershed app", "Connect to firebase and get the array of critical value");
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError err) {
+                        Log.d("Watershed app", "Error connecting firebase " + err.getMessage());
+                    }
+                });
     }
 
     /**
@@ -105,9 +123,12 @@ public class AddReportActivity extends AppCompatActivity {
      * Updating the data to firebase
      */
     private void addWaterReportToFirebase() {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("criticalLevel", (double) seekBarValue / 100.0);
-        databaseReference.child(locationAvailable.getSelectedItem().toString()).updateChildren(hashMap);
+        if (newArrayData == null) {
+            Log.d("Watershed", "newArrayData is null");
+        }
+        Log.d("Watershed", "Add Critical value");
+        newArrayData.add((double) seekBarValue / 100.0);
+        databaseReference.child(locationAvailable.getSelectedItem().toString()).child("criticalLevel").setValue(newArrayData);
     }
 
     /**
