@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.example.haidangdam.watershed.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -41,277 +40,279 @@ import com.google.firebase.database.FirebaseDatabase;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
-    private static final int FACEBOOK_REQUEST_CODE = 1709;
-    private static final int RC_SIGN_IN = 9001;
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    Button LogInButton;
-    EditText userNameLogin;
-    EditText passwordLogin;
-    Button registrationButton;
-    SignInButton googleSignIn;
-    DatabaseReference refUser;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private ProgressDialog progressDialog;
-    private LoginButton logInFacebook;
-    private CallbackManager callbackManager;
-    private GoogleApiClient mGoogleApiClient;
-    private String pathUser = "userID";
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext(), FACEBOOK_REQUEST_CODE);
-        setContentView(R.layout.activity_login);
-        LogInButton = (Button) findViewById(R.id.email_sign_in_button);
-        userNameLogin = (EditText) findViewById(R.id.email);
-        passwordLogin = (EditText) findViewById(R.id.password);
-        registrationButton = (Button) findViewById(R.id.registration_sign_in_button);
-        logInFacebook = (LoginButton) findViewById(R.id.login_button);
-        logInFacebook.setReadPermissions("email", "public_profile");
-        progressDialog = new ProgressDialog(this);
-        googleSignIn = (SignInButton) findViewById(R.id.sign_in_button);
-        callbackManager = CallbackManager.Factory.create();
-        if (getIntent().getExtras() != null) {
-            putDataIntoField(getIntent().getExtras());
+  private static final int FACEBOOK_REQUEST_CODE = 1709;
+  private static final int RC_SIGN_IN = 9001;
+  private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+  Button LogInButton;
+  EditText userNameLogin;
+  EditText passwordLogin;
+  Button registrationButton;
+  SignInButton googleSignIn;
+  DatabaseReference refUser;
+  private FirebaseAuth mAuth;
+  private FirebaseAuth.AuthStateListener mAuthListener;
+  private ProgressDialog progressDialog;
+  private LoginButton logInFacebook;
+  private CallbackManager callbackManager;
+  private GoogleApiClient mGoogleApiClient;
+  private String pathUser = "userID";
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    FacebookSdk.sdkInitialize(getApplicationContext(), FACEBOOK_REQUEST_CODE);
+    setContentView(R.layout.activity_login);
+    LogInButton = (Button) findViewById(R.id.email_sign_in_button);
+    userNameLogin = (EditText) findViewById(R.id.email);
+    passwordLogin = (EditText) findViewById(R.id.password);
+    registrationButton = (Button) findViewById(R.id.registration_sign_in_button);
+    logInFacebook = (LoginButton) findViewById(R.id.login_button);
+    logInFacebook.setReadPermissions("email", "public_profile");
+    progressDialog = new ProgressDialog(this);
+    googleSignIn = (SignInButton) findViewById(R.id.sign_in_button);
+    callbackManager = CallbackManager.Factory.create();
+    if (getIntent().getExtras() != null) {
+      putDataIntoField(getIntent().getExtras());
+    }
+    registrationButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        goToRegistrationActivity();
+      }
+    });
+    mAuth = FirebaseAuth.getInstance();
+    mAuthListener = new FirebaseAuth.AuthStateListener() {
+      @Override
+      public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        if (user != null) {
+
+          Log.d("MAIN ACTIVITY", "USER SIGN IN");
+        } else {
+          Log.d("MAIN ACTIVITY", "USER SIGN OUT");
         }
-        registrationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToRegistrationActivity();
-            }
-        });
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if (user != null) {
-
-                    Log.d("MAIN ACTIVITY", "USER SIGN IN");
-                } else {
-                    Log.d("MAIN ACTIVITY", "USER SIGN OUT");
-                }
-            }
-        };
-        LogInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (userNameLogin.getText().toString().isEmpty() |
-                        passwordLogin.getText().toString().isEmpty()) {
-                    processEmptyTextField();
-                } else {
-                    authenticateUser();
-                }
-            }
-
-        });
-        logInFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("Android", "Facebook login: " + loginResult);
-                handleFacebookLoginToken(loginResult.getAccessToken());
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d("Facebook", "User cancel");
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                Toast.makeText(getApplicationContext(), "Log in failed: " + exception.toString(),
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail().build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this).
-                addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
-        googleSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signInWithGoogleActivity();
-            }
-        });
-        refUser = database.getReference(pathUser);
-    }
-
-    /**
-     * Action when the either user input is empty
-     */
-    private void processEmptyTextField() {
-        Context context = getApplicationContext();
-        CharSequence string = "You need to type password or user name login";
-        int duration = Toast.LENGTH_LONG;
-
-        Toast toast = Toast.makeText(context, string, duration);
-        toast.show();
-    }
-
-
-    /**
-     * Go to registration screen when hitting registration button
-     */
-    private void goToRegistrationActivity() {
-        Intent registrationActivity = new Intent(this, RegistrationActivity.class);
-        startActivity(registrationActivity);
-    }
-
-
-    /**
-     * Put all the data passed from the registration to the appropriate field
-     *
-     * @param data The data that pass from the registration
-     */
-    private void putDataIntoField(Bundle data) {
-        Log.d("Device in put Data", "here");
-        userNameLogin.setText(data.getString(RegistrationActivity.username));
-        passwordLogin.setText(data.getString(RegistrationActivity.password));
-    }
-
-
-    /**
-     * Authenticate the password and email from Firebase Database
-     */
-    private void authenticateUser() {
-        progressDialog.setMessage("Please wait!!");
-        progressDialog.show();
-        mAuth.signInWithEmailAndPassword(userNameLogin.getText().toString(),
-                passwordLogin.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> result) {
-                progressDialog.dismiss();
-                if (!result.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), result.getException().toString(),
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    processCorrectPasswordAndUsername();
-                }
-            }
-        });
-    }
-
-
-    /**
-     * If it is the right password, move to the main activity
-     */
-    private void processCorrectPasswordAndUsername() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
-
-    /**
-     * Sign in with facebook using Firebase
-     *
-     * @param token The token confirmation from Facebook
-     */
-    private void handleFacebookLoginToken(AccessToken token) {
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential).addOnCompleteListener(this,
-                new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            processCorrectPasswordAndUsername();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Login failed: " + task.getException(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-
-    /**
-     * After running authorization with Facebook or , coming back to the main screen, this method will be invoked
-     * Call Back Manager will get the data from log in activity an run the registration.
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (FacebookSdk.isFacebookRequestCode(requestCode)) {
-            callbackManager.onActivityResult(requestCode, resultCode, data);
+      }
+    };
+    LogInButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (userNameLogin.getText().toString().isEmpty() |
+            passwordLogin.getText().toString().isEmpty()) {
+          processEmptyTextField();
+        } else {
+          authenticateUser();
         }
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult googleSignIn = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (googleSignIn.isSuccess()) {
-                GoogleSignInAccount googleAccount = googleSignIn.getSignInAccount();
-                signInWithGoogleThroughFirebase(googleAccount);
+      }
+
+    });
+    logInFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+      @Override
+      public void onSuccess(LoginResult loginResult) {
+        Log.d("Android", "Facebook login: " + loginResult);
+        handleFacebookLoginToken(loginResult.getAccessToken());
+      }
+
+      @Override
+      public void onCancel() {
+        Log.d("Facebook", "User cancel");
+      }
+
+      @Override
+      public void onError(FacebookException exception) {
+        Toast.makeText(getApplicationContext(), "Log in failed: " + exception.toString(),
+            Toast.LENGTH_LONG).show();
+      }
+    });
+    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(getString(R.string.default_web_client_id))
+        .requestEmail().build();
+    mGoogleApiClient = new GoogleApiClient.Builder(this).
+        addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
+    googleSignIn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        signInWithGoogleActivity();
+      }
+    });
+    refUser = database.getReference(pathUser);
+  }
+
+  /**
+   * Action when the either user input is empty
+   */
+  private void processEmptyTextField() {
+    Context context = getApplicationContext();
+    CharSequence string = "You need to type password or user name login";
+    int duration = Toast.LENGTH_LONG;
+
+    Toast toast = Toast.makeText(context, string, duration);
+    toast.show();
+  }
+
+
+  /**
+   * Go to registration screen when hitting registration button
+   */
+  private void goToRegistrationActivity() {
+    Intent registrationActivity = new Intent(this, RegistrationActivity.class);
+    startActivity(registrationActivity);
+  }
+
+
+  /**
+   * Put all the data passed from the registration to the appropriate field
+   *
+   * @param data The data that pass from the registration
+   */
+  private void putDataIntoField(Bundle data) {
+    Log.d("Device in put Data", "here");
+    userNameLogin.setText(data.getString(RegistrationActivity.username));
+    passwordLogin.setText(data.getString(RegistrationActivity.password));
+  }
+
+
+  /**
+   * Authenticate the password and email from Firebase Database
+   */
+  private void authenticateUser() {
+    progressDialog.setMessage("Please wait!!");
+    progressDialog.show();
+    mAuth.signInWithEmailAndPassword(userNameLogin.getText().toString(),
+        passwordLogin.getText().toString())
+        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+          @Override
+          public void onComplete(@NonNull Task<AuthResult> result) {
+            progressDialog.dismiss();
+            if (!result.isSuccessful()) {
+              Toast.makeText(getApplicationContext(), result.getException().toString(),
+                  Toast.LENGTH_LONG).show();
+            } else {
+              processCorrectPasswordAndUsername();
             }
-        }
-    }
+          }
+        });
+  }
 
-    /**
-     * This activity will start the background call to Google server to authenticate user
-     */
-    private void signInWithGoogleActivity() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
 
-    /**
-     * After having the google account successfully authenticated by google, we will get it
-     * sign it with our app through Firebase
-     *
-     * @param acct the google account we get from the user and authenticated by google
-     */
-    private void signInWithGoogleThroughFirebase(GoogleSignInAccount acct) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(this,
-                new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Authentication failed: "
-                                    + task.getException(), Toast.LENGTH_LONG).show();
-                        } else {
-                            processCorrectPasswordAndUsername();
-                        }
-                    }
-                });
-    }
+  /**
+   * If it is the right password, move to the main activity
+   */
+  private void processCorrectPasswordAndUsername() {
+    Intent intent = new Intent(this, MainActivity.class);
+    startActivity(intent);
+  }
 
-    /**
-     * Call this when the user come BACK to the activity
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-        mGoogleApiClient.connect();
-    }
 
-    /**
-     * Call this when the activity is no longer visible
-     */
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-        mGoogleApiClient.disconnect();
-    }
+  /**
+   * Sign in with facebook using Firebase
+   *
+   * @param token The token confirmation from Facebook
+   */
+  private void handleFacebookLoginToken(AccessToken token) {
+    AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+    mAuth.signInWithCredential(credential).addOnCompleteListener(this,
+        new OnCompleteListener<AuthResult>() {
+          @Override
+          public void onComplete(@NonNull Task<AuthResult> task) {
+            if (task.isSuccessful()) {
+              processCorrectPasswordAndUsername();
+            } else {
+              Toast.makeText(getApplicationContext(), "Login failed: " + task.getException(),
+                  Toast.LENGTH_LONG).show();
+            }
+          }
+        });
+  }
 
-    /**
-     * Call this when the user resume to the activity
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        mGoogleApiClient.connect();
+  /**
+   * After running authorization with Facebook or , coming back to the main screen, this method will
+   * be invoked Call Back Manager will get the data from log in activity an run the registration.
+   */
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (FacebookSdk.isFacebookRequestCode(requestCode)) {
+      callbackManager.onActivityResult(requestCode, resultCode, data);
     }
+    if (requestCode == RC_SIGN_IN) {
+      GoogleSignInResult googleSignIn = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+      if (googleSignIn.isSuccess()) {
+        GoogleSignInAccount googleAccount = googleSignIn.getSignInAccount();
+        signInWithGoogleThroughFirebase(googleAccount);
+      }
+    }
+  }
 
-    /**
-     * Call this when the user leave the activity
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-        mGoogleApiClient.disconnect();
+  /**
+   * This activity will start the background call to Google server to authenticate user
+   */
+  private void signInWithGoogleActivity() {
+    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+    startActivityForResult(signInIntent, RC_SIGN_IN);
+  }
+
+  /**
+   * After having the google account successfully authenticated by google, we will get it sign it
+   * with our app through Firebase
+   *
+   * @param acct the google account we get from the user and authenticated by google
+   */
+  private void signInWithGoogleThroughFirebase(GoogleSignInAccount acct) {
+    AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+    mAuth.signInWithCredential(credential).addOnCompleteListener(this,
+        new OnCompleteListener<AuthResult>() {
+          @Override
+          public void onComplete(@NonNull Task<AuthResult> task) {
+            if (!task.isSuccessful()) {
+              Toast.makeText(getApplicationContext(), "Authentication failed: "
+                  + task.getException(), Toast.LENGTH_LONG).show();
+            } else {
+              processCorrectPasswordAndUsername();
+            }
+          }
+        });
+  }
+
+  /**
+   * Call this when the user come BACK to the activity
+   */
+  @Override
+  public void onStart() {
+    super.onStart();
+    mAuth.addAuthStateListener(mAuthListener);
+    mGoogleApiClient.connect();
+  }
+
+  /**
+   * Call this when the activity is no longer visible
+   */
+  @Override
+  public void onStop() {
+    super.onStop();
+    if (mAuthListener != null) {
+      mAuth.removeAuthStateListener(mAuthListener);
     }
+    mGoogleApiClient.disconnect();
+  }
+
+  /**
+   * Call this when the user resume to the activity
+   */
+  @Override
+  public void onResume() {
+    super.onResume();
+    mGoogleApiClient.connect();
+  }
+
+  /**
+   * Call this when the user leave the activity
+   */
+  @Override
+  public void onPause() {
+    super.onPause();
+    mGoogleApiClient.disconnect();
+  }
 }
 
