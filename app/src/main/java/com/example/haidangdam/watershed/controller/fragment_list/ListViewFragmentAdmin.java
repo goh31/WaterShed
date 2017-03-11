@@ -224,8 +224,7 @@ public class ListViewFragmentAdmin extends Fragment {
       view.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          EventBus.getDefault().post(new GeoLocation(waterDataList.get(position).getL().get(0),
-              waterDataList.get(position).getL().get(1)));
+          EventBus.getDefault().post(waterDataList.get(position));
           MapFragmentWatershed mapFragment = MapFragmentWatershed.newInstance();
           FragmentTransaction transaction = ((FragmentActivity) mContext)
               .getSupportFragmentManager().beginTransaction();

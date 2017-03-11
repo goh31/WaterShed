@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.example.haidangdam.watershed.R;
 import com.firebase.geofire.GeoLocation;
@@ -35,10 +36,12 @@ import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
@@ -51,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
+import model.WaterData;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
@@ -74,6 +78,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
   int callMapDraw = 0;
   int time = 0;
   View v;
+  WaterData waterData;
   private boolean permissionDenied = false;
   private GoogleApiClient mGoogleApiClient;
 
@@ -147,6 +152,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
       Log.d("Location", "Location is not null");
       LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
       EventBus.getDefault().post(location);
+      gMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
       gMap.addMarker(new MarkerOptions().position(current).title("Current location"));
       gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, CITY));
       time++;
@@ -277,26 +283,19 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
     mGoogleApiClient.connect();
   }
 
-    /*
-     * Calling this method when the fragment is first started (check the lifecycle for more information)
-     */
-  //@Override
-  //public void onStart() {
-  //super.onStart();
-
-  //}
-
 
   /**
    * @param loc
    */
   @Subscribe
-  public void getNewLocation(GeoLocation loc) {
+  public void getNewLocation(WaterData loc) {
     if (callMapDraw == 0) {
-      destinationLocation = loc;
+      destinationLocation = new GeoLocation(loc.getL().get(0), loc.getL().get(1));
+      waterData = loc;
       String url = drawPolylineOnMapURL();
       gMap.addMarker(new MarkerOptions().position(new LatLng(destinationLocation.latitude,
-          destinationLocation.longitude)).title("destination"));
+          destinationLocation.longitude)).title(loc.getlocationName())).setTag(loc);
+
       callMapDraw++;
       MyAsyncTaskMapDownloading myAsyncTask = new MyAsyncTaskMapDownloading(
           getApplicationContext());
@@ -529,4 +528,34 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
       }
     }
   }
+
+  /**
+   * Custumize info window for marker in google map
+   */
+  private class MyInfoWindowAdapter implements InfoWindowAdapter {
+    View v;
+    public MyInfoWindowAdapter() {
+      v = getActivity().getLayoutInflater().inflate(R.layout.info_window_adapter, null);
+    }
+
+    @Override
+    public View getInfoContents(Marker marker) {
+      if (marker.getTag() != null) {
+        TextView infoWindowTitle = (TextView) v.findViewById(R.id.info_window_adapter_title);
+        infoWindowTitle.setText(marker.getTitle());
+        TextView infoWindowContent = (TextView) v.findViewById(R.id.info_window_adapter_content);
+        infoWindowContent.setText("Critcal Level is: " + ((WaterData) marker.getTag()).getcriticalLevel().get(
+            ((WaterData) marker.getTag()).getcriticalLevel().size() - 1));
+        return v;
+      }
+      return null;
+    }
+
+    @Override
+    public View getInfoWindow(Marker marker) {
+      return null;
+    }
+
+  }
+
 }
