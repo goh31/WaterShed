@@ -12,7 +12,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -49,7 +51,7 @@ public class ListViewFragmentAdmin extends Fragment {
   private Set<String> waterResourceNearby;
   private ArrayList<WaterData> waterDataList;
   private DatabaseReference waterDatabaseRef;
-
+  private Context mCtx;
   public static ListViewFragmentAdmin newInstance() {
     ListViewFragmentAdmin a = new ListViewFragmentAdmin();
     return a;
@@ -71,7 +73,25 @@ public class ListViewFragmentAdmin extends Fragment {
     layoutManager.setOrientation(layoutManager.VERTICAL);
     recyclerView.setLayoutManager(layoutManager);
     locationAdapter = new ListLocationAdapter(getActivity(), waterDataList);
+    mCtx= getActivity();
     recyclerView.setAdapter(locationAdapter);
+    recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
+        recyclerView, new ClickListener() {
+      @Override
+      public void onLongClick(View v, int position) {}
+
+      @Override
+      public void onClick(View v, int position) {
+        EventBus.getDefault().post(waterDataList.get(position));
+        MapFragmentWatershed mapFragment = MapFragmentWatershed.newInstance();
+        FragmentTransaction transaction = ((FragmentActivity) mCtx)
+            .getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.main_activity_worker_view_pager, mapFragment); // work but buggy
+        transaction.addToBackStack("list");
+        transaction.commit();
+        callMapFragment(mapFragment);
+      }
+    }));
     instanceMain = (MainActivity) getActivity();
     return rootView;
   }
@@ -155,7 +175,7 @@ public class ListViewFragmentAdmin extends Fragment {
     geoFire = new GeoFire(waterDatabaseRef);
     // In the future, let the user decide where they want to be.
     geoQuery = geoFire.queryAtLocation(new GeoLocation(currentLocation.getLatitude(),
-        currentLocation.getLongitude()), 3);
+        currentLocation.getLongitude()), 3)
     waterResourceNearby = new HashSet<String>();
     Log.d("WaterShed app", "setupGeoFire");
     geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
@@ -217,35 +237,11 @@ public class ListViewFragmentAdmin extends Fragment {
     @Override
     public ListLocationViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
       View view = LayoutInflater.from(viewGroup.getContext())
-          .inflate(R.layout.item_list_view, null);
+          .inflate(R.layout.item_list_view, viewGroup, false);
       position = i;
       Log.d("Watershed app", "Press at the location " + i);
       ListLocationViewHolder viewHolder = new ListLocationViewHolder(view);
-      view.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          EventBus.getDefault().post(waterDataList.get(position));
-          MapFragmentWatershed mapFragment = MapFragmentWatershed.newInstance();
-          FragmentTransaction transaction = ((FragmentActivity) mContext)
-              .getSupportFragmentManager().beginTransaction();
-          transaction.add(R.id.main_activity_worker_view_pager, mapFragment); // work but buggy
-          transaction.addToBackStack("list");
-          transaction.commit();
-          callMapFragment(mapFragment);
-        }
-      });
       return viewHolder;
-    }
-
-    /**
-     * Calling map fragment to show the direction when pressing to the child in the RecyclerView
-     *
-     * @param fragment the mapfragment that we created when we add to the stack when clicking on the
-     * child
-     */
-    private void callMapFragment(MapFragmentWatershed fragment) {
-      Log.d("Watershed app", "List View call map fragment");
-      instanceMain.changeToMapFragment(fragment);
     }
 
     @Override
@@ -260,7 +256,7 @@ public class ListViewFragmentAdmin extends Fragment {
     @Override
     public int getItemCount() {
       if (waterDataList != null) {
-        Log.d("Watershed app", "Recycler List has data");
+        Log.d("Watershed app", "Recycler List has data: " + waterDataList.size());
         return waterDataList.size();
       } else {
         Log.d("WaterShed app", "Recycler list has no data");
@@ -272,7 +268,7 @@ public class ListViewFragmentAdmin extends Fragment {
     /**
      * The Recycler View's ViewHolder
      */
-    class ListLocationViewHolder extends RecyclerView.ViewHolder {
+    class ListLocationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
       protected TextView LocationName;
       protected TextView criticalLevel;
@@ -288,6 +284,9 @@ public class ListViewFragmentAdmin extends Fragment {
         this.criticalLevel = (TextView) itemView.findViewById(R.id.water_level_item_text);
       }
 
+      @Override
+      public void onClick(View v) {
+      }
 
       /**
        * The Location TextView in the child view
@@ -308,6 +307,62 @@ public class ListViewFragmentAdmin extends Fragment {
       }
 
     }
+  }
+  /**
+   * Calling map fragment to show the direction when pressing to the child in the RecyclerView
+   *
+   * @param fragment the mapfragment that we created when we add to the stack when clicking on the
+   * child
+   */
+  private void callMapFragment(MapFragmentWatershed fragment) {
+    Log.d("Watershed app", "List View call map fragment");
+    instanceMain.changeToMapFragment(fragment);
+  }
+
+  public static interface ClickListener {
+    public void onClick(View view, int position);
+    public void onLongClick(View view, int position);
+  }
+  private class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+    private ClickListener clickListener;
+    private GestureDetector gestureDetector;
+    private RecyclerView rv;
+    public RecyclerTouchListener(Context context, RecyclerView recyclerView,
+        final ClickListener clickListener){
+      this.clickListener = clickListener;
+      rv = recyclerView;
+      gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+          Log.d("Watershed app", "Recycler Touch Listener on single tap up");
+          return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+          View child = rv.findChildViewUnder(e.getX(), e.getY());
+          if (child != null && clickListener != null) {
+            clickListener.onLongClick(child, rv.getChildAdapterPosition(child));
+          }
+        }
+      });
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+      Log.d("Watershed app", "Recycler Touch Listener on intercept touch event");
+      View child = rv.findChildViewUnder(e.getX(), e.getY());
+      if (child != null && rv != null) {
+        clickListener.onClick(child, rv.getChildAdapterPosition(child));
+      }
+      return false;
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {}
   }
 
 }

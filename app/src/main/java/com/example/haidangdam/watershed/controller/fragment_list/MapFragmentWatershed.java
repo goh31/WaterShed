@@ -522,6 +522,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
       }
 
       if (lineOptions != null) {
+        gMap.animateCamera(CameraUpdateFactory.zoomBy(-2));
         gMap.addPolyline(lineOptions);
       } else {
         Log.d("Parser Task Map", "polyline not drawn because it is null");
@@ -530,8 +531,8 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
   }
 
   /**
-   * Custumize info window for marker in google map
-   */
+   * Custumize info window for marker in goole map
+ c  */
   private class MyInfoWindowAdapter implements InfoWindowAdapter {
     View v;
     public MyInfoWindowAdapter() {
