@@ -17,6 +17,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -33,8 +34,12 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import model.User;
 
 /**
  * A login screen that offers login via email/password.
@@ -45,11 +50,13 @@ public class LoginActivity extends AppCompatActivity {
   private static final int RC_SIGN_IN = 9001;
   private final FirebaseDatabase database = FirebaseDatabase.getInstance();
   Button LogInButton;
+  Button ResetPassword;
   EditText userNameLogin;
   EditText passwordLogin;
   Button registrationButton;
   SignInButton googleSignIn;
   DatabaseReference refUser;
+  DataSnapshot data;
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthListener;
   private ProgressDialog progressDialog;
@@ -72,9 +79,23 @@ public class LoginActivity extends AppCompatActivity {
     progressDialog = new ProgressDialog(this);
     googleSignIn = (SignInButton) findViewById(R.id.sign_in_button);
     callbackManager = CallbackManager.Factory.create();
+    refUser = database.getReference(pathUser);
+    refUser.addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        data = dataSnapshot;
+      }
+
+      @Override
+      public void onCancelled(DatabaseError dError) {
+        Log.d("Watershed app", dError.getDetails());
+      }
+    });
+
     if (getIntent().getExtras() != null) {
       putDataIntoField(getIntent().getExtras());
     }
+
     registrationButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -88,9 +109,15 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
         if (user != null) {
+          if (data != null && !data.hasChild(user.getUid())) {
+            User userData = new User(user.getEmail(), "Worker");
+            userData.setName(user.getDisplayName());
+            refUser.child(user.getUid()).setValue(userData);
 
+          }
           Log.d("MAIN ACTIVITY", "USER SIGN IN");
         } else {
+          LoginManager.getInstance().logOut();
           Log.d("MAIN ACTIVITY", "USER SIGN OUT");
         }
       }
@@ -136,7 +163,13 @@ public class LoginActivity extends AppCompatActivity {
         signInWithGoogleActivity();
       }
     });
-    refUser = database.getReference(pathUser);
+    ResetPassword = (Button) findViewById(R.id.reset_password_button_login);
+    ResetPassword.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startActivity(new Intent(getApplicationContext(), ResetPassword.class));
+      }
+    });
   }
 
   /**

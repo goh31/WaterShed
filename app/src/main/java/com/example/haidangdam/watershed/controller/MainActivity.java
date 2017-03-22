@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import com.example.haidangdam.watershed.R;
 import com.example.haidangdam.watershed.controller.fragment_list.ListViewFragmentAdmin;
 import com.example.haidangdam.watershed.controller.fragment_list.MapFragmentWatershed;
+import com.example.haidangdam.watershed.controller.fragment_list.ProfileFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
     MapFragmentWatershed mapFragmentMyAdapter;
     ListViewFragmentAdmin listViewFragment;
+    ProfileFragment profileFragment;
     Context ctx;
     private String[] field = new String[]{"Map", "Location", "Profile"};
 
@@ -159,7 +161,10 @@ public class MainActivity extends AppCompatActivity {
           }
           return listViewFragment;
         case 2:
-          return ListViewFragmentAdmin.newInstance();
+          if (profileFragment == null) {
+            profileFragment = ProfileFragment.newInstance();
+          }
+          return profileFragment;
         default:
           return null;
       }

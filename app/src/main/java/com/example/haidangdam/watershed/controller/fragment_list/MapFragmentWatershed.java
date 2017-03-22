@@ -531,10 +531,12 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
   }
 
   /**
-   * Custumize info window for marker in goole map
- c  */
+   * Custumize info window for marker in goole map c
+   */
   private class MyInfoWindowAdapter implements InfoWindowAdapter {
+
     View v;
+
     public MyInfoWindowAdapter() {
       v = getActivity().getLayoutInflater().inflate(R.layout.info_window_adapter, null);
     }
@@ -545,8 +547,9 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
         TextView infoWindowTitle = (TextView) v.findViewById(R.id.info_window_adapter_title);
         infoWindowTitle.setText(marker.getTitle());
         TextView infoWindowContent = (TextView) v.findViewById(R.id.info_window_adapter_content);
-        infoWindowContent.setText("Critcal Level is: " + ((WaterData) marker.getTag()).getcriticalLevel().get(
-            ((WaterData) marker.getTag()).getcriticalLevel().size() - 1));
+        infoWindowContent
+            .setText("Critcal Level is: " + ((WaterData) marker.getTag()).getcriticalLevel().get(
+                ((WaterData) marker.getTag()).getcriticalLevel().size() - 1));
         return v;
       }
       return null;

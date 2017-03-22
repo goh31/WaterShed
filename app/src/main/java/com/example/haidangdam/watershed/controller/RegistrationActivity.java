@@ -132,8 +132,6 @@ public class RegistrationActivity extends AppCompatActivity {
   private void addToDatabase(String userID) {
     User newUser = new User(emailEditText.getText().toString(),
         spinnerRegistration.getSelectedItem().toString());
-    newUser.setHomeAddress(addressRegistration.getText().toString());
-    newUser.setPhoneNumber(phoneNumberRegistration.getText().toString());
     newUser.setName(nameRegistration.getText().toString());
     Log.d("Finish", "Finish");
     databaseUser.child(userID).setValue(newUser);

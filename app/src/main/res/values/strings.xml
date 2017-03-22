@@ -1,27 +1,27 @@
 <resources>
-    <string name="app_name">WaterShed</string>
-    <string name="title_activity_login">Sign in</string>
+  <string name="app_name">WaterShed</string>
+  <string name="title_activity_login">Sign in</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
+  <!-- Strings related to login -->
+  <string name="prompt_email">Email</string>
+  <string name="prompt_password">Password (optional)</string>
+  <string name="action_sign_in">Sign in or register</string>
+  <string name="action_sign_in_short">Sign in</string>
+  <string name="error_invalid_email">This email address is invalid</string>
+  <string name="error_invalid_password">This password is too short</string>
+  <string name="error_incorrect_password">This password is incorrect</string>
+  <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="action_string_registration"> "Register new account"</string>
-    <string name="title_activity_registration">RegistrationActivity</string>
-    <string name="user_name_text_field">Username</string>
-    <string name="password_text_field">Password</string>
-    <string name="email_text_field">Email</string>
-    <string name="facebook_app_id">1250463921708585</string>
-    <string name="google_maps_key">AIzaSyAVRF4t17_ZbED1qQx8rwx4btCGolV-eIU</string>
-    <string name="map_fragment_tag">MapFragmentTag</string>
-    <string name="action_bar">Add report</string>
+  <string name="action_string_registration"> "Register new account"</string>
+  <string name="title_activity_registration">RegistrationActivity</string>
+  <string name="user_name_text_field">Username</string>
+  <string name="password_text_field">Password</string>
+  <string name="email_text_field">Email</string>
+  <string name="facebook_app_id">1250463921708585</string>
+  <string name="google_maps_key">AIzaSyAVRF4t17_ZbED1qQx8rwx4btCGolV-eIU</string>
+  <string name="map_fragment_tag">MapFragmentTag</string>
+  <string name="action_bar">Add report</string>
 
 </resources>

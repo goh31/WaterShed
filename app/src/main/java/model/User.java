@@ -1,16 +1,16 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * Created by haidangdam on 2/17/17.
  */
 
-public class User {
-
+public class User implements Serializable {
+  private static final long serialVersionUID = 1L;
   String email;
   String credential;
   String name;
-  String homeAddress;
-  String phoneNumber;
 
   public User() {
 
@@ -41,20 +41,8 @@ public class User {
     this.name = name;
   }
 
-  public String getHomeAddress() {
-    return homeAddress;
-  }
 
-  public void setHomeAddress(String homeAddress) {
-    this.homeAddress = homeAddress;
-  }
 
-  public String getPhoneNumber() {
-    return phoneNumber;
-  }
 
-  public void setPhoneNumber(String phoneNumber) {
-    this.phoneNumber = phoneNumber;
-  }
 
 }

@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:background="@drawable/bluebg">
 
     <TextView
-        android:text="Hello, User!"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/helloUser" />
@@ -21,11 +21,11 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/nameTextField"
+        android:id="@+id/name_edit_profile"
         android:hint="Your Name" />
 
     <TextView
-        android:text="HOME ADDRESS"
+        android:text="EMAIL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/homeAddressPrompt" />
@@ -33,24 +33,10 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress|textPersonName"
         android:ems="10"
-        android:id="@+id/homeAddressField"
-        android:hint="Ferst Drive 350" />
-
-    <TextView
-        android:text="PHONE NUMBER"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/phoneNumberPrompt" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/phoneNumberField"
-        android:hint="(404) 000-0000" />
+        android:id="@+id/email_edit_profile"
+        android:hint="Your email" />
 
     <Button
         android:text="Update"
@@ -58,15 +44,4 @@
         android:layout_height="wrap_content"
         android:id="@+id/updateButton" />
 
-    <Button
-        android:text="Log Off"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/log_off_button" />
-
-    <Button
-        android:text="Confirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button_info_to_main_activity"/>
 </LinearLayout>

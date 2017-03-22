@@ -46,6 +46,7 @@ dependencies {
     compile 'com.firebase:geofire-android:2.1.1'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
 
     testCompile 'junit:junit:4.12'
 

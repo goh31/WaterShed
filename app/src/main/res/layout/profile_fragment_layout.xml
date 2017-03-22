@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical" android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/bluebg"
+  android:weightSum="1">
+
+
+  <TextView
+    android:text="TextView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_name_title_text"
+    android:textSize="30sp"
+    android:layout_weight="0.05" />
+  <TextView
+    android:textSize="20sp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_name_text"
+    android:textColor="#F4F6F7"
+    android:layout_weight="0.05" />
+  <TextView
+    android:text="Email"
+    android:textSize="30sp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_email_title_text"
+    android:layout_weight="0.04" />
+  <TextView
+    android:textSize="20sp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_email_text"
+    android:textColor="#F4F6F7"
+    android:layout_weight="0.05" />
+  <TextView
+    android:text="Credential"
+    android:textSize="30sp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_credential_title_text"
+    android:layout_weight="0.05" />
+  <TextView
+    android:textSize="20sp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_credential_text"
+    android:textColor="#F4F6F7"
+    android:layout_weight="0.05" />
+  <Button
+    android:text="Profile Edit"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/profile_edit_button" />
+  <Button
+    android:text="Sign out"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/sign_out"/>
+
+</LinearLayout>

@@ -1,53 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.haidangdam.watershed">
+  package="com.example.haidangdam.watershed">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        android:largeHeap="true">
+      android:allowBackup="true"
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:largeHeap="true"
+      android:supportsRtl="true"
+      android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name=".controller.LoginActivity"
-            android:label="@string/title_activity_login">
+          android:label="@string/title_activity_login"
+          android:name=".controller.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.NextActivity"
-            android:label="Next Activity" />
-        <activity android:name=".controller.MainActivity"
-            android:label="Main Activity">
-        </activity>
-        <activity android:name=".controller.RegistrationActivity"></activity>
-        <activity android:name=".controller.AddReportActivity"
-            android:label="Add Report"
-            android:parentActivityName=".controller.MainActivity"></activity>
+          android:label="Main Activity"
+          android:name=".controller.MainActivity"></activity>
+        <activity android:name=".controller.RegistrationActivity" />
+        <activity
+          android:label="Add Report"
+          android:name=".controller.AddReportActivity"
+          android:parentActivityName=".controller.MainActivity" />
+
         <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+          android:name="com.google.android.geo.API_KEY"
+          android:value="@string/google_maps_key" />
         <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
+          android:name="com.google.android.gms.version"
+          android:value="@integer/google_play_services_version" />
+        <meta-data
+          android:name="com.facebook.sdk.ApplicationId"
+          android:value="@string/facebook_app_id" />
+
+        <activity
+          android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+          android:label="@string/app_name"
+          android:name="com.facebook.FacebookActivity"
+          android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".controller.DetailReportData" />
+        <activity android:name=".controller.ResetPassword" />
+        <activity android:name=".controller.EditProfile"></activity>
     </application>
 
 </manifest>

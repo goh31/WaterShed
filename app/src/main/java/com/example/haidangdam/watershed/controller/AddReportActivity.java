@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.Date;
 import model.WaterData;
 
 /**
@@ -38,6 +39,7 @@ public class AddReportActivity extends AppCompatActivity {
   int i = 0;
   ProgressDialog progressDialog;
   ArrayList<Double> newArrayData;
+  ArrayList<Date> newArrayDate;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class AddReportActivity extends AppCompatActivity {
       Log.d("Watershed app", "get intent and get extras is not null");
       arrSpinner = getIntent().getExtras().getStringArrayList("stringArray");
     }
+    //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     locationAvailable = (Spinner) findViewById(R.id.location_spinner_report);
     setArrayAdapter();
     progressDialog = new ProgressDialog(this);
@@ -88,6 +91,7 @@ public class AddReportActivity extends AppCompatActivity {
           public void onDataChange(DataSnapshot dataSnapshot) {
             WaterData data = (WaterData) dataSnapshot.getValue(WaterData.class);
             newArrayData = data.getcriticalLevel();
+            newArrayDate = data.getdatelist();
             Log.d("Watershed app", "Connect to firebase and get the array of critical value");
           }
 
@@ -127,8 +131,11 @@ public class AddReportActivity extends AppCompatActivity {
     }
     Log.d("Watershed", "Add Critical value");
     newArrayData.add((double) seekBarValue / 100.0);
+    newArrayDate.add(new Date());
     databaseReference.child(locationAvailable.getSelectedItem().toString()).child("criticalLevel")
         .setValue(newArrayData);
+    databaseReference.child(locationAvailable.getSelectedItem().toString()).child("datelist").
+        setValue(newArrayDate);
   }
 
   /**
