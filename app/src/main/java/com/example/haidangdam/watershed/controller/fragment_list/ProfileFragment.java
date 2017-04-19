@@ -30,14 +30,14 @@ import model.User;
 public class ProfileFragment extends Fragment {
 
   public static final String USER_DATA = "user";
-  TextView profileName;
-  TextView profileEmail;
-  TextView profileCredential;
-  Button profileUpdateButton;
-  FirebaseUser user;
-  DatabaseReference userDatabaseref;
-  User userData;
-  Button signOut;
+  private TextView profileName;
+  private TextView profileEmail;
+  private TextView profileCredential;
+  private Button profileUpdateButton;
+  private FirebaseUser user;
+  private DatabaseReference userDatabaseref;
+  private User userData;
+  private Button signOut;
 
   public static ProfileFragment newInstance() {
     ProfileFragment a = new ProfileFragment();

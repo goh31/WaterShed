@@ -8,9 +8,9 @@ import java.io.Serializable;
 
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
-  String email;
-  String credential;
-  String name;
+  private String email;
+  private String credential;
+  private String name;
 
   public User() {
 

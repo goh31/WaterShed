@@ -1,22 +1,9 @@
 package com.example.haidangdam.watershed.controller;
 
-import android.app.Activity;
-import android.os.Bundle;
-import com.example.haidangdam.watershed.R;
-import com.example.haidangdam.watershed.controller.fragment_list.ListViewFragmentAdmin;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import model.WaterData;
-
 /**
  * Created by haidangdam on 3/18/17.
  */
-
+/*
 public class DetailReportData extends Activity {
 
   @Override
@@ -48,3 +35,4 @@ public class DetailReportData extends Activity {
   }
 
 }
+*/

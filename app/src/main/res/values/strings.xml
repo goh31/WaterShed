@@ -23,5 +23,11 @@
   <string name="google_maps_key">AIzaSyAVRF4t17_ZbED1qQx8rwx4btCGolV-eIU</string>
   <string name="map_fragment_tag">MapFragmentTag</string>
   <string name="action_bar">Add report</string>
+  <string name="text_overall_water_condition_title">Water Condition</string>
+  <string name="virus_ppm_title">Virus PPM</string>
+  <string name="contaminant_ppm_title">Contaminant PPM</string>
+  <string name="location_title">Location</string>
+  <string name="user_button_report">User Report</string>
+  <string name="worker_button_report">Worker Report</string>
 
 </resources>

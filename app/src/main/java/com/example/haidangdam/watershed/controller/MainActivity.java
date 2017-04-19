@@ -19,7 +19,15 @@ import com.example.haidangdam.watershed.controller.fragment_list.ListViewFragmen
 import com.example.haidangdam.watershed.controller.fragment_list.MapFragmentWatershed;
 import com.example.haidangdam.watershed.controller.fragment_list.ProfileFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import model.User;
 
 /**
  * Created by haidangdam on 2/18/17.
@@ -29,18 +37,21 @@ public class MainActivity extends AppCompatActivity {
 
   public static final String ARRAY_LIST_KEY = "stringArray";
   static final int NUM_COUNTS = 3;
-  ViewPager viewPager;
-  TabLayout tabLayout;
-  MapFragmentWatershed mapFragment;
-  MyAdapter myAdapter;
-  Toolbar toolBar;
+  private ViewPager viewPager;
+  private TabLayout tabLayout;
+  private MapFragmentWatershed mapFragment;
+  private MyAdapter myAdapter;
+  private Toolbar toolBar;
+  private DatabaseReference userDatabaseref;
   private GoogleApiClient mGoogleApiClient;
-
+  private FirebaseUser user;
+  private User userData;
+  private int a = 0;
+  private String credential = "";
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main_activity_worker);
-
     viewPager = (ViewPager) findViewById(R.id.main_activity_worker_view_pager);
     viewPager.setAdapter(new MyAdapter(getSupportFragmentManager(), MainActivity.this));
     myAdapter = (MyAdapter) viewPager.getAdapter();
@@ -53,8 +64,24 @@ public class MainActivity extends AppCompatActivity {
     tabLayout.setupWithViewPager(viewPager);
     toolBar = (Toolbar) findViewById(R.id.my_toolbar);
     setSupportActionBar(toolBar);
+    user = FirebaseAuth.getInstance().getCurrentUser();
+    userDatabaseref = FirebaseDatabase.getInstance().getReference().child("userID")
+        .child(user.getUid());
+    userDatabaseref.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot ds) {
+        Log.d("Watershed app", "abc");
+        userData = ds.getValue(User.class);
+        credential = userData.getCredential();
+      }
 
+      @Override
+      public void onCancelled(DatabaseError error) {
+        Log.d("Watershed app", "dbRef error: " + error.getMessage());
+      }
+    });
   }
+
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -66,8 +93,16 @@ public class MainActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.action_add: {
+        Intent intent;
         Log.d("Watershed", "Touch the add button");
-        Intent intent = new Intent(MainActivity.this, AddReportActivity.class);
+        if (user == null) {
+          Log.d("User is 123", ""+ credential);
+        }
+        if (userData.getCredential().equals("User")) {
+          intent = new Intent(MainActivity.this, AddReportUserActivity.class);
+        } else {
+          intent = new Intent(MainActivity.this, AddReportWorkerControl.class);
+        }
         Bundle bundle = new Bundle();
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.addAll(myAdapter.getListViewFragmentAdmin().getListWaterResourceNearby());
@@ -122,10 +157,10 @@ public class MainActivity extends AppCompatActivity {
    */
   public static class MyAdapter extends FragmentPagerAdapter {
 
-    MapFragmentWatershed mapFragmentMyAdapter;
-    ListViewFragmentAdmin listViewFragment;
-    ProfileFragment profileFragment;
-    Context ctx;
+    private MapFragmentWatershed mapFragmentMyAdapter;
+    private ListViewFragmentAdmin listViewFragment;
+    private ProfileFragment profileFragment;
+    private Context ctx;
     private String[] field = new String[]{"Map", "Location", "Profile"};
 
     /**

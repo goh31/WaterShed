@@ -2,11 +2,9 @@ package com.example.haidangdam.watershed.controller.fragment_list;
 
 
 import static android.R.id.list;
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,12 +21,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.example.haidangdam.watershed.R;
-import com.example.haidangdam.watershed.controller.DetailReportData;
 import com.example.haidangdam.watershed.controller.MainActivity;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import model.User;
 import model.WaterData;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -48,10 +47,10 @@ public class ListViewFragmentAdmin extends Fragment {
   public static final String WATERDATAOBJECT = "waterDataObject";
   public static Location currentLocation;
   private static MainActivity instanceMain;
-  RecyclerView recyclerView;
-  GeoQuery geoQuery;
-  GeoFire geoFire;
-  ListLocationAdapter locationAdapter;
+  private RecyclerView recyclerView;
+  private GeoQuery geoQuery;
+  private GeoFire geoFire;
+  private ListLocationAdapter locationAdapter;
   int alreadyStart = 0;
   boolean allowToStart = false;
   int longClickPosition;
@@ -59,7 +58,7 @@ public class ListViewFragmentAdmin extends Fragment {
   private ArrayList<WaterData> waterDataList;
   private DatabaseReference waterDatabaseRef;
   private Context mCtx;
-
+  private User user;
   public static ListViewFragmentAdmin newInstance() {
     ListViewFragmentAdmin a = new ListViewFragmentAdmin();
     return a;
@@ -82,19 +81,34 @@ public class ListViewFragmentAdmin extends Fragment {
     recyclerView.setLayoutManager(layoutManager);
     locationAdapter = new ListLocationAdapter(getActivity(), waterDataList);
     mCtx = getActivity();
+    DatabaseReference userDatabaseRef = FirebaseDatabase.getInstance().getReference().child("userId")
+        .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    userDatabaseRef.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot ds) {
+        user = (User) ds.getValue();
+      }
+
+      @Override
+      public void onCancelled(DatabaseError de) {
+        Log.d("WaterShed app", de.getDetails());
+      }
+    });
+
     recyclerView.setAdapter(locationAdapter);
     recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
         recyclerView, new ClickListener() {
       @Override
       public void onLongClick(View v, int position) {
         Log.d("Watershed app", "On Long Click");
-        longClickPosition = position;
-        WaterData reportData = waterDataList.get(longClickPosition);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(WATERDATAOBJECT, reportData);
-        Intent intent = new Intent(getApplicationContext(), DetailReportData.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
+        if (user.getCredential().equals("Manager"));
+        //longClickPosition = position;
+        //WaterData reportData = waterDataList.get(longClickPosition);
+        //Bundle bundle = new Bundle();
+        //bundle.putSerializable(WATERDATAOBJECT, reportData);
+        //Intent intent = new Intent(getApplicationContext(), DetailReportData.class);
+        //intent.putExtras(bundle);
+        //startActivity(intent);
       }
 
       @Override
@@ -306,9 +320,6 @@ public class ListViewFragmentAdmin extends Fragment {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder customViewHolder, int i) {
       WaterData data = waterDataList.get(i);
-      ((ListLocationViewHolder) customViewHolder).criticalLevel.
-          setText("The Level of water is " + data.getcriticalLevel().
-              get(data.getcriticalLevel().size() - 1));
       ((ListLocationViewHolder) customViewHolder).LocationName.setText(data.getlocationName());
     }
 
@@ -330,7 +341,6 @@ public class ListViewFragmentAdmin extends Fragment {
     class ListLocationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
       protected TextView LocationName;
-      protected TextView criticalLevel;
       private Context ctx;
 
       /**
@@ -341,7 +351,6 @@ public class ListViewFragmentAdmin extends Fragment {
       public ListLocationViewHolder(View itemView) {
         super(itemView);
         this.LocationName = (TextView) itemView.findViewById(R.id.name_view_item_text);
-        this.criticalLevel = (TextView) itemView.findViewById(R.id.water_level_item_text);
         ctx = itemView.getContext();
       }
 
@@ -364,13 +373,13 @@ public class ListViewFragmentAdmin extends Fragment {
        *
        * @return the critical level TextView in the child view
        */
-      public TextView getCriticalLevelTextView() {
-        return criticalLevel;
-      }
 
     }
   }
 
+  /**
+   *
+   */
   private class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
     private ClickListener clickListener;

@@ -19,9 +19,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class ResetPassword extends AppCompatActivity {
 
-  EditText emailEditText;
-  Button resetPasswordButton;
-  FirebaseAuth auth;
+  private EditText emailEditText;
+  private Button resetPasswordButton;
+  private FirebaseAuth auth;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {

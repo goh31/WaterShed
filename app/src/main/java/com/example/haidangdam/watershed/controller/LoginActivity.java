@@ -49,21 +49,21 @@ public class LoginActivity extends AppCompatActivity {
   private static final int FACEBOOK_REQUEST_CODE = 1709;
   private static final int RC_SIGN_IN = 9001;
   private final FirebaseDatabase database = FirebaseDatabase.getInstance();
-  Button LogInButton;
-  Button ResetPassword;
-  EditText userNameLogin;
-  EditText passwordLogin;
-  Button registrationButton;
-  SignInButton googleSignIn;
-  DatabaseReference refUser;
-  DataSnapshot data;
+  private Button LogInButton;
+  private Button ResetPassword;
+  private EditText userNameLogin;
+  private EditText passwordLogin;
+  private Button registrationButton;
+  private SignInButton googleSignIn;
+  private DatabaseReference refUser;
+  private DataSnapshot data;
   private FirebaseAuth mAuth;
   private FirebaseAuth.AuthStateListener mAuthListener;
   private ProgressDialog progressDialog;
   private LoginButton logInFacebook;
   private CallbackManager callbackManager;
   private GoogleApiClient mGoogleApiClient;
-  private String pathUser = "userID";
+  private final String pathUser = "userID";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -113,7 +113,6 @@ public class LoginActivity extends AppCompatActivity {
             User userData = new User(user.getEmail(), "Worker");
             userData.setName(user.getDisplayName());
             refUser.child(user.getUid()).setValue(userData);
-
           }
           Log.d("MAIN ACTIVITY", "USER SIGN IN");
         } else {
@@ -233,6 +232,9 @@ public class LoginActivity extends AppCompatActivity {
    * If it is the right password, move to the main activity
    */
   private void processCorrectPasswordAndUsername() {
+    if (data == null) {
+      Log.d("Hai-Dang Dam", "F*** you");
+    }
     Intent intent = new Intent(this, MainActivity.class);
     startActivity(intent);
   }

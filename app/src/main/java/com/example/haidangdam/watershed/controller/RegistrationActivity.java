@@ -28,14 +28,14 @@ public class RegistrationActivity extends AppCompatActivity {
   public static final String password = "PASSWORD";
   public static final String username = "USERNAME";
   public static final String PATH_USER = "userID";
-  EditText emailEditText;
-  EditText passwordEditText;
-  Button registrationButton;
-  DatabaseReference databaseUser;
-  Spinner spinnerRegistration;
-  EditText phoneNumberRegistration;
-  EditText nameRegistration;
-  EditText addressRegistration;
+  private EditText emailEditText;
+  private EditText passwordEditText;
+  private Button registrationButton;
+  private DatabaseReference databaseUser;
+  private Spinner spinnerRegistration;
+  private EditText phoneNumberRegistration;
+  private EditText nameRegistration;
+  private EditText addressRegistration;
   private FirebaseAuth mAuth;
   private ProgressDialog progressDialog;
 

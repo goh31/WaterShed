@@ -70,15 +70,15 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
 
   public static final int REQUEST_CODE = 2;
   private final int CITY = 15;
-  MapView mapView;
-  GoogleMap gMap;
-  LocationRequest locationRequest;
-  Location location;
-  GeoLocation destinationLocation;
+  private MapView mapView;
+  private GoogleMap gMap;
+  private LocationRequest locationRequest;
+  private Location location;
+  private GeoLocation destinationLocation;
   int callMapDraw = 0;
   int time = 0;
-  View v;
-  WaterData waterData;
+  private View v;
+  private WaterData waterData;
   private boolean permissionDenied = false;
   private GoogleApiClient mGoogleApiClient;
 
@@ -546,10 +546,7 @@ public class MapFragmentWatershed extends Fragment implements LocationListener,
       if (marker.getTag() != null) {
         TextView infoWindowTitle = (TextView) v.findViewById(R.id.info_window_adapter_title);
         infoWindowTitle.setText(marker.getTitle());
-        TextView infoWindowContent = (TextView) v.findViewById(R.id.info_window_adapter_content);
-        infoWindowContent
-            .setText("Critcal Level is: " + ((WaterData) marker.getTag()).getcriticalLevel().get(
-                ((WaterData) marker.getTag()).getcriticalLevel().size() - 1));
+        //TextView infoWindowContent = (TextView) v.findViewById(R.id.info_window_adapter_content);
         return v;
       }
       return null;

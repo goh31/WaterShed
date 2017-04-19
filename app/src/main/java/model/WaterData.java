@@ -10,19 +10,23 @@ import java.util.ArrayList;
 
 public class WaterData implements Serializable {
   private static final long serialVersionUID = 1L;
-  String name;
-  ArrayList<Double> drinkingLevel;
-  ArrayList<Double> l;
-  ArrayList<Date> datelist;
-  String g;
+  private String name;
+  private ArrayList<Double> l;
+  private ArrayList<Date> datelist;
+  private String g;
+  private String waterType;
+  private String waterCondition;
+  private ArrayList<String> reporterId;
+  private ArrayList<Double> virusPPM;
+  private ArrayList<Double> contaminantPPM;
+
 
   public WaterData() {
   }
 
-  public WaterData(String name, ArrayList<Double> l, ArrayList<Double> drinkingLevel, String g, ArrayList<Date> datelist) {
+  public WaterData(String name, ArrayList<Double> l,  String g, ArrayList<Date> datelist) {
     this.name = name;
     this.g = g;
-    this.drinkingLevel = drinkingLevel;
     this.l = l;
     this.datelist = datelist;
   }
@@ -35,13 +39,6 @@ public class WaterData implements Serializable {
     this.name = name;
   }
 
-  public ArrayList<Double> getcriticalLevel() {
-    return this.drinkingLevel;
-  }
-
-  public void setcriticalLevel(ArrayList<Double> a) {
-    drinkingLevel = a;
-  }
 
   public ArrayList<Double> getL() {
     return l;
@@ -55,7 +52,6 @@ public class WaterData implements Serializable {
     return g;
   }
 
-
   public void setg(String g) {
     this.g = g;
   }
@@ -65,4 +61,25 @@ public class WaterData implements Serializable {
   public void setdatelist(ArrayList<Date> datelist) {
     this.datelist = datelist;
   }
+
+  public String getwaterType() { return waterType; }
+
+  public String getwaterCondition() {return waterCondition; }
+
+  public ArrayList<String> getreporterId() {return reporterId; }
+
+  public void setwaterType(String s) {waterType = s;}
+
+  public void setwaterCondition(String s) {waterCondition = s;}
+
+  public void setreporterId(ArrayList<String> s) {reporterId = s;}
+
+  public void setvirusPPM(ArrayList<Double> a) {virusPPM = a;}
+
+  public void setcontaminantPPM(ArrayList<Double> a) {contaminantPPM = a;}
+
+  public ArrayList<Double> getvirusPPM() {return virusPPM;}
+
+  public ArrayList<Double> getcontaminantPPM() {return contaminantPPM;}
+
 }

@@ -19,7 +19,7 @@
       android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
           android:label="@string/title_activity_login"
-          android:name=".controller.LoginActivity">
+          android:name=".controller.WelcomingScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,7 @@
         <activity android:name=".controller.RegistrationActivity" />
         <activity
           android:label="Add Report"
-          android:name=".controller.AddReportActivity"
+          android:name=".controller.AddReportUserActivity"
           android:parentActivityName=".controller.MainActivity" />
 
         <meta-data
@@ -51,9 +51,11 @@
           android:label="@string/app_name"
           android:name="com.facebook.FacebookActivity"
           android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".controller.DetailReportData" />
         <activity android:name=".controller.ResetPassword" />
         <activity android:name=".controller.EditProfile"></activity>
+        <activity android:name=".controller.AddReportWorkerActivity"></activity>
+        <activity android:name=".controller.AddReportWorkerControl"></activity>
+        <activity android:name=".controller.LoginActivity"></activity>
     </application>
 
 </manifest>

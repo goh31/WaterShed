@@ -23,13 +23,13 @@ import model.User;
 
 public class EditProfile extends AppCompatActivity {
 
-  TextView helloTextView;
-  EditText emailUpdateProfile;
-  EditText nameUpdateProfile;
-  Button button;
-  User user;
-  FirebaseUser userFirebase;
-  DatabaseReference refUser;
+  private TextView helloTextView;
+  private EditText emailUpdateProfile;
+  private EditText nameUpdateProfile;
+  private Button button;
+  private User user;
+  private FirebaseUser userFirebase;
+  private DatabaseReference refUser;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
